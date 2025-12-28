@@ -1,16 +1,18 @@
 import "server-only";
 
-import { neonConfig } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import ws from "ws";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/client";
-import { keys } from "./keys";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-neonConfig.webSocketConstructor = ws;
+// Use DIRECT_URL for database connection (bypasses connection pooler)
+const connectionString =
+  process.env.DIRECT_URL ||
+  "postgresql://postgres:eHBInh1K2tBAEZfZ@db.mnvraegclumofybqxbhp.supabase.co:5432/postgres";
 
-const adapter = new PrismaNeon({ connectionString: keys().DATABASE_URL });
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
 
 export const database = globalForPrisma.prisma || new PrismaClient({ adapter });
 
