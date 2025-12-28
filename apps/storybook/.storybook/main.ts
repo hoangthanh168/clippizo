@@ -26,6 +26,18 @@ const config: StorybookConfig = {
     options: {},
   },
   staticDirs: ["../public"],
+  webpackFinal: async (config) => {
+    // Mock observability packages to avoid next/router dependency issues in Storybook
+    if (config.resolve) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        "@repo/observability/error": require.resolve("./observability-mock.ts"),
+        "@sentry/nextjs": require.resolve("./sentry-mock.ts"),
+        "@logtail/next": require.resolve("./logtail-mock.ts"),
+      };
+    }
+    return config;
+  },
 };
 
 export default config;
