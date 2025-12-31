@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Accordion,
   AccordionContent,
@@ -5,6 +7,7 @@ import {
   AccordionTrigger,
 } from "@repo/design-system/components/ui/accordion";
 import { Button } from "@repo/design-system/components/ui/button";
+import { useMounted } from "@repo/design-system/hooks/use-mounted";
 import type { Dictionary } from "@repo/internationalization";
 import { PhoneCall } from "lucide-react";
 import Link from "next/link";
@@ -13,7 +16,10 @@ type FAQProps = {
   dictionary: Dictionary;
 };
 
-export const FAQ = ({ dictionary }: FAQProps) => (
+export const FAQ = ({ dictionary }: FAQProps) => {
+  const mounted = useMounted();
+
+  return (
   <div className="w-full py-20 lg:py-40">
     <div className="container mx-auto">
       <div className="grid gap-10 lg:grid-cols-2">
@@ -37,15 +43,26 @@ export const FAQ = ({ dictionary }: FAQProps) => (
             </div>
           </div>
         </div>
-        <Accordion className="w-full" collapsible type="single">
-          {dictionary.web.home.faq.items.map((item, index) => (
-            <AccordionItem key={index} value={`index-${index}`}>
-              <AccordionTrigger>{item.question}</AccordionTrigger>
-              <AccordionContent>{item.answer}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        {mounted ? (
+          <Accordion className="w-full" collapsible type="single">
+            {dictionary.web.home.faq.items.map((item, index) => (
+              <AccordionItem key={index} value={`index-${index}`}>
+                <AccordionTrigger>{item.question}</AccordionTrigger>
+                <AccordionContent>{item.answer}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        ) : (
+          <div className="w-full space-y-4">
+            {dictionary.web.home.faq.items.map((item, index) => (
+              <div key={index} className="border-b pb-4">
+                <p className="font-medium">{item.question}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   </div>
-);
+  );
+};

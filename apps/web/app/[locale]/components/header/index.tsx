@@ -10,9 +10,9 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@repo/design-system/components/ui/navigation-menu";
+import { useMounted } from "@repo/design-system/hooks/use-mounted";
 import type { Dictionary } from "@repo/internationalization";
-import { CommandIcon, Menu, MoveRight, X } from "lucide-react";
-import Image from "next/image";
+import { Menu, MoveRight, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { env } from "@/env";
@@ -23,6 +23,7 @@ type HeaderProps = {
 };
 
 export const Header = ({ dictionary }: HeaderProps) => {
+  const mounted = useMounted();
   const navigationItems = [
     {
       title: dictionary.web.header.home,
@@ -59,56 +60,66 @@ export const Header = ({ dictionary }: HeaderProps) => {
     <header className="sticky top-0 left-0 z-40 w-full border-b bg-background">
       <div className="container relative mx-auto flex min-h-20 flex-row items-center gap-4 lg:grid lg:grid-cols-3">
         <div className="hidden flex-row items-center justify-start gap-4 lg:flex">
-          <NavigationMenu className="flex items-start justify-start">
-            <NavigationMenuList className="flex flex-row justify-start gap-4">
-              {navigationItems.map((item) => (
-                <NavigationMenuItem key={item.title}>
-                  {item.href ? (
-                    <NavigationMenuLink asChild>
-                      <Button asChild variant="ghost">
-                        <Link href={item.href}>{item.title}</Link>
-                      </Button>
-                    </NavigationMenuLink>
-                  ) : (
-                    <>
-                      <NavigationMenuTrigger className="font-medium text-sm">
-                        {item.title}
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent className="!w-[450px] p-4">
-                        <div className="flex grid-cols-2 flex-col gap-4 lg:grid">
-                          <div className="flex h-full flex-col justify-between">
-                            <div className="flex flex-col">
-                              <p className="text-base">{item.title}</p>
-                              <p className="text-muted-foreground text-sm">
-                                {item.description}
-                              </p>
+          {mounted ? (
+            <NavigationMenu className="flex items-start justify-start">
+              <NavigationMenuList className="flex flex-row justify-start gap-4">
+                {navigationItems.map((item) => (
+                  <NavigationMenuItem key={item.title}>
+                    {item.href ? (
+                      <NavigationMenuLink asChild>
+                        <Button asChild variant="ghost">
+                          <Link href={item.href}>{item.title}</Link>
+                        </Button>
+                      </NavigationMenuLink>
+                    ) : (
+                      <>
+                        <NavigationMenuTrigger className="font-medium text-sm">
+                          {item.title}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent className="!w-[450px] p-4">
+                          <div className="flex grid-cols-2 flex-col gap-4 lg:grid">
+                            <div className="flex h-full flex-col justify-between">
+                              <div className="flex flex-col">
+                                <p className="text-base">{item.title}</p>
+                                <p className="text-muted-foreground text-sm">
+                                  {item.description}
+                                </p>
+                              </div>
+                              <Button asChild className="mt-10" size="sm">
+                                <Link href="/contact">
+                                  {dictionary.web.global.primaryCta}
+                                </Link>
+                              </Button>
                             </div>
-                            <Button asChild className="mt-10" size="sm">
-                              <Link href="/contact">
-                                {dictionary.web.global.primaryCta}
-                              </Link>
-                            </Button>
+                            <div className="flex h-full flex-col justify-end text-sm">
+                              {item.items?.map((subItem, idx) => (
+                                <NavigationMenuLink
+                                  className="flex flex-row items-center justify-between rounded px-4 py-2 hover:bg-muted"
+                                  href={subItem.href}
+                                  key={idx}
+                                >
+                                  <span>{subItem.title}</span>
+                                  <MoveRight className="h-4 w-4 text-muted-foreground" />
+                                </NavigationMenuLink>
+                              ))}
+                            </div>
                           </div>
-                          <div className="flex h-full flex-col justify-end text-sm">
-                            {item.items?.map((subItem, idx) => (
-                              <NavigationMenuLink
-                                className="flex flex-row items-center justify-between rounded px-4 py-2 hover:bg-muted"
-                                href={subItem.href}
-                                key={idx}
-                              >
-                                <span>{subItem.title}</span>
-                                <MoveRight className="h-4 w-4 text-muted-foreground" />
-                              </NavigationMenuLink>
-                            ))}
-                          </div>
-                        </div>
-                      </NavigationMenuContent>
-                    </>
-                  )}
-                </NavigationMenuItem>
+                        </NavigationMenuContent>
+                      </>
+                    )}
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+          ) : (
+            <nav className="flex flex-row gap-4">
+              {navigationItems.map((item) => (
+                <Button key={item.title} asChild variant="ghost">
+                  <Link href={item.href || "#"}>{item.title}</Link>
+                </Button>
               ))}
-            </NavigationMenuList>
-          </NavigationMenu>
+            </nav>
+          )}
         </div>
         <div className="flex items-center gap-2 lg:justify-center">
           <svg
@@ -131,12 +142,16 @@ export const Header = ({ dictionary }: HeaderProps) => {
             <Link href="/contact">{dictionary.web.header.contact}</Link>
           </Button>
           <div className="hidden border-r md:inline" />
-          <div className="hidden md:inline">
-            <LanguageSwitcher />
-          </div>
-          <div className="hidden md:inline">
-            <ModeToggle />
-          </div>
+          {mounted && (
+            <div className="hidden md:inline">
+              <LanguageSwitcher />
+            </div>
+          )}
+          {mounted && (
+            <div className="hidden md:inline">
+              <ModeToggle />
+            </div>
+          )}
           <Button asChild className="hidden md:inline" variant="outline">
             <Link href={`${env.NEXT_PUBLIC_APP_URL}/sign-in`}>
               {dictionary.web.header.signIn}
