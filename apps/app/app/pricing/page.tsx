@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 
 const PLANS = {
@@ -42,7 +42,7 @@ const PLANS = {
 
 type PlanId = keyof typeof PLANS;
 
-export default function PricingPage() {
+function PricingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const isRenewal = searchParams.get("renew") === "true";
@@ -249,5 +249,13 @@ export default function PricingPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+      <PricingContent />
+    </Suspense>
   );
 }
