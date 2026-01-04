@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "n8n-mcp-skills@n8n-mcp-skills": true,
+    "supabase@claude-plugins-official": true,
+    "context7@claude-plugins-official": true
+  }
+}
