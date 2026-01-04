@@ -4,6 +4,7 @@ import { AnalyticsProvider } from "@repo/analytics/provider";
 import { DesignSystemProvider } from "@repo/design-system";
 import { fonts } from "@repo/design-system/lib/fonts";
 import { Toolbar } from "@repo/feature-flags/components/toolbar";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { ReactNode } from "react";
 
 type RootLayoutProperties = {
@@ -26,6 +27,7 @@ const RootLayout = ({ children }: RootLayoutProperties) => (
         </DesignSystemProvider>
       </AnalyticsProvider>
       <Toolbar />
+      <SpeedInsights />
     </body>
   </html>
 );

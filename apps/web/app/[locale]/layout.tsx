@@ -6,6 +6,7 @@ import { fonts } from "@repo/design-system/lib/fonts";
 import { cn } from "@repo/design-system/lib/utils";
 import { Toolbar } from "@repo/feature-flags/components/toolbar";
 import { getDictionary } from "@repo/internationalization";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { ReactNode } from "react";
 import { Footer } from "./components/footer";
 import { Header } from "./components/header";
@@ -37,6 +38,7 @@ const RootLayout = async ({ children, params }: RootLayoutProperties) => {
           <Toolbar />
           <CMSToolbar />
         </AnalyticsProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
