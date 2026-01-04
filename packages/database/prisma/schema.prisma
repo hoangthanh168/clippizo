@@ -26,11 +26,10 @@ model Profile {
   phoneNumber   String?   @map("phone_number")
 
   // Subscription & Payments
-  plan              String    @default("free")
-  stripeCustomerId  String?   @unique @map("stripe_customer_id")
-  subscriptionId    String?   @map("subscription_id")
-  subscriptionStatus String?  @map("subscription_status") // active, canceled, past_due
-  billingEmail      String?   @map("billing_email")
+  plan                  String    @default("free") // free, pro, enterprise
+  subscriptionStatus    String?   @map("subscription_status") // active, expired, cancelled
+  subscriptionExpiresAt DateTime? @map("subscription_expires_at")
+  billingEmail          String?   @map("billing_email")
 
   // Metadata
   metadata   Json      @default("{}")
@@ -43,11 +42,38 @@ model Profile {
   videos            Video[]
   transcripts       Transcript[]
   transcriptChunks  TranscriptChunk[]
+  payments          Payment[]
 
   @@index([clerkUserId])
-  @@index([stripeCustomerId])
   @@index([email])
   @@map("profiles")
+}
+
+// ============================================
+// Payments (PayPal & SePay)
+// ============================================
+
+model Payment {
+  id                    String   @id @default(cuid())
+  profileId             String   @map("profile_id")
+  profile               Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  amount                Decimal
+  currency              String   // VND or USD
+  provider              String   // sepay or paypal
+  providerTransactionId String   @map("provider_transaction_id")
+  providerOrderId       String?  @map("provider_order_id")
+  status                String   @default("pending") // pending, completed, failed, refunded
+  plan                  String   // pro or enterprise
+  metadata              Json     @default("{}")
+
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@unique([provider, providerTransactionId])
+  @@index([profileId])
+  @@index([createdAt])
+  @@map("payments")
 }
 
 // ============================================

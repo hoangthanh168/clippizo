@@ -188,7 +188,7 @@ When setting up database:
 - Database connection failures (Prisma/Supabase)
 - Authentication errors (Clerk middleware)
 - Missing required environment variables (Zod validation in `keys.ts`)
-- Invalid webhook signatures (Stripe, Clerk via Svix)
+- Invalid webhook signatures (PayPal, SePay, Clerk via Svix)
 
 **Log and continue for:**
 - Analytics events (PostHog, GA)
@@ -215,8 +215,14 @@ import { log } from '@repo/observability';
 ```
 Profile (profiles)
 ├── id, clerkUserId, email, firstName, lastName
-├── plan, stripeCustomerId, subscriptionId, subscriptionStatus
-└── Relations: channels[], videos[], transcripts[], transcriptChunks[]
+├── plan, subscriptionStatus, subscriptionExpiresAt
+└── Relations: channels[], videos[], transcripts[], transcriptChunks[], payments[]
+
+Payment (payments)
+├── profileId → Profile
+├── amount, currency, provider (paypal/sepay), status
+├── providerTransactionId, providerOrderId
+└── @@unique([provider, providerTransactionId])
 
 Channel (channels)
 ├── profileId → Profile
@@ -431,3 +437,10 @@ Docs: https://docs.astral.sh/uv/
 - **n8n workflows**: Use Supabase service_role key for admin operations
 - Chunk size: ~500-1000 tokens for optimal RAG
 - Embedding dimension: 1536 (Gemini, set output_dimensionality=1536)
+
+## Active Technologies
+- TypeScript 5.x, Node.js 20+ LTS + Next.js (App Router), PayPal TypeScript SDK, SePay SDK/API, Prisma ORM (001-paypal-sepay-payments)
+- PostgreSQL 15+ via Supabase (existing database) (001-paypal-sepay-payments)
+
+## Recent Changes
+- 001-paypal-sepay-payments: Added TypeScript 5.x, Node.js 20+ LTS + Next.js (App Router), PayPal TypeScript SDK, SePay SDK/API, Prisma ORM

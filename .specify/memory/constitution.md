@@ -107,7 +107,7 @@ End-to-end type safety and robust security posture. Security is a feature, not a
 | Styling | Tailwind CSS | 4.x | Design system integration |
 | Database | PostgreSQL | 15+ | Via Prisma ORM |
 | Auth | Clerk | Latest | No custom auth |
-| Payments | Stripe | Latest SDK | Subscription management |
+| Payments | PayPal + SePay | Latest SDK | One-time subscriptions |
 | Email | Resend | Latest | Transactional emails |
 | Analytics | PostHog + GA | Latest | Product + web analytics |
 | Observability | Sentry | Latest | Error tracking, performance |

@@ -51,7 +51,7 @@ next-forge comes with batteries included:
 - **Authentication** — Powered by [Clerk](https://clerk.com)
 - **Database** — Type-safe ORM with migrations
 - **Design System** — Comprehensive component library with dark mode
-- **Payments** — Subscription management via [Stripe](https://stripe.com)
+- **Payments** — One-time subscriptions via [PayPal](https://paypal.com) (international) and [SePay](https://sepay.vn) (Vietnam)
 - **Email** — Transactional emails via [Resend](https://resend.com)
 - **Analytics** — Web ([Google Analytics](https://developers.google.com/analytics)) and product ([Posthog](https://posthog.com))
 - **Observability** — Error tracking ([Sentry](https://sentry.io)), logging, and uptime monitoring ([BetterStack](https://betterstack.com))
@@ -73,7 +73,7 @@ next-forge comes with batteries included:
 
 - Node.js 20+
 - [pnpm](https://pnpm.io) (or npm/yarn/bun)
-- [Stripe CLI](https://docs.stripe.com/stripe-cli) for local webhook testing
+- [ngrok](https://ngrok.com) or similar for local webhook testing
 
 ### Installation
 
@@ -86,7 +86,7 @@ npx next-forge@latest init
 ### Setup
 
 1. Configure your environment variables
-2. Set up required service accounts (Clerk, Stripe, Resend, etc.)
+2. Set up required service accounts (Clerk, PayPal, SePay, Resend, etc.)
 3. Run the development server
 
 For detailed setup instructions, read the [documentation](https://www.next-forge.com/docs).
