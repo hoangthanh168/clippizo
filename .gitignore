@@ -276,4 +276,5 @@ packages/database/generated
 # Documentation
 .contentlayer
 .content-collections
+.source/
 .sourcen8n/
