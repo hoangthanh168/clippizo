@@ -203,22 +203,80 @@ import { log } from '@repo/observability';
 
 ## Supabase Database (Production)
 
-> **Note**: Đang phát triển và test tính năng qua n8n workflows trước khi triển khai vào codebase.
+> **Schema**: Managed via Prisma (`packages/database/prisma/schema.prisma`)
 
 ### Project Info
 - **Supabase Project ID**: `qbzrpyacypogivpvooct`
 - **Region**: ap-south-1
 - **Embedding**: Google gemini-embedding-001 (1536 dims, output_dimensionality=1536)
 
-### Database Tables (YouTube Transcript RAG)
-- `channels` - YouTube channel info (channel_id, channel_name, subscriber_count)
-- `videos` - Video metadata (video_id, title, duration, tags, published_at)
-- `transcripts` - Full transcript text with timestamps
-- `transcript_chunks` - Chunks with vector embeddings for RAG
+### Database Schema (Prisma)
 
-### Key SQL Functions
+```
+Profile (profiles)
+├── id, clerkUserId, email, firstName, lastName
+├── plan, stripeCustomerId, subscriptionId, subscriptionStatus
+└── Relations: channels[], videos[], transcripts[], transcriptChunks[]
+
+Channel (channels)
+├── profileId → Profile
+├── channelId (YouTube), channelName, description
+└── Relations: videos[]
+
+Video (videos)
+├── profileId → Profile, channelId → Channel
+├── videoId (YouTube), title, duration, tags[]
+└── Relations: transcript, transcriptChunks[]
+
+Transcript (transcripts)
+├── profileId → Profile, videoId → Video
+├── fullText, wordCount, language, source
+└── Relations: chunks[]
+
+TranscriptChunk (transcript_chunks)
+├── profileId → Profile, transcriptId → Transcript, videoId → Video
+├── content, chunkIndex, tokenCount, startTime, endTime
+└── embedding: vector(1536)
+```
+
+### Database Commands
+```bash
+# Generate Prisma client (after schema changes)
+npm run build --filter database
+
+# Push schema changes to database
+cd packages/database && npx prisma db push
+
+# View database in Prisma Studio
+cd packages/database && npx prisma studio
+```
+
+### Usage in Code
+```typescript
+import { database } from "@repo/database";
+
+// Create profile (via Clerk webhook)
+await database.profile.upsert({
+  where: { clerkUserId: data.id },
+  create: { clerkUserId: data.id, email, firstName },
+  update: { email, firstName },
+});
+
+// Get user's videos
+const videos = await database.video.findMany({
+  where: { profileId: profile.id },
+  include: { channel: true },
+});
+```
+
+### RLS & Security
+- **RLS enabled** on all tables (Supabase)
+- **Prisma** for application queries (bypasses RLS via service role)
+- **Frontend** should use Supabase client with user JWT for RLS enforcement
+
+### Key SQL Functions (for RAG)
 ```sql
--- Semantic search (RAG)
+-- Semantic search - auto-filters by current user
 SELECT * FROM match_transcript_chunks(embedding, 0.7, 10);
 
 -- Full-text search
@@ -365,7 +423,11 @@ Docs: https://docs.astral.sh/uv/
 
 ## Important Notes (Database/RAG)
 
-- ALWAYS use service_role key for insert/update (RLS enabled, public read only)
+- **Schema management**: Prisma schema at `packages/database/prisma/schema.prisma`
+- **User ownership**: All data linked to `profiles.id` via `profileId` field
+- **Clerk sync**: Webhook at `/api/webhooks/auth` syncs Clerk users to `profiles` table via Prisma
+- **Payments sync**: Webhook at `/api/webhooks/payments` updates subscription status via Prisma
+- **RLS enabled**: For frontend Supabase client; Prisma uses service role (bypasses RLS)
+- **n8n workflows**: Use Supabase service_role key for admin operations
 - Chunk size: ~500-1000 tokens for optimal RAG
 - Embedding dimension: 1536 (Gemini, set output_dimensionality=1536)
-- Foreign keys: videos → channels, transcripts → videos, chunks → transcripts/videos

@@ -1,5 +1,5 @@
 import { analytics } from "@repo/analytics/server";
-import { clerkClient } from "@repo/auth/server";
+import { database } from "@repo/database";
 import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
 import type { Stripe } from "@repo/payments";
@@ -8,15 +8,11 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { env } from "@/env";
 
-const getUserFromCustomerId = async (customerId: string) => {
-  const clerk = await clerkClient();
-  const users = await clerk.users.getUserList();
-
-  const user = users.data.find(
-    (currentUser) => currentUser.privateMetadata.stripeCustomerId === customerId
-  );
-
-  return user;
+// Get profile from database by Stripe customer ID
+const getProfileFromCustomerId = async (customerId: string) => {
+  return database.profile.findUnique({
+    where: { stripeCustomerId: customerId },
+  });
 };
 
 const handleCheckoutSessionCompleted = async (
@@ -28,15 +24,30 @@ const handleCheckoutSessionCompleted = async (
 
   const customerId =
     typeof data.customer === "string" ? data.customer : data.customer.id;
-  const user = await getUserFromCustomerId(customerId);
 
-  if (!user) {
+  // Get subscription details
+  const subscriptionId = typeof data.subscription === "string"
+    ? data.subscription
+    : data.subscription?.id;
+
+  // Update profile with subscription info
+  const profile = await database.profile.update({
+    where: { stripeCustomerId: customerId },
+    data: {
+      subscriptionId,
+      subscriptionStatus: "active",
+      billingEmail: data.customer_email,
+    },
+  });
+
+  if (!profile) {
+    log.warn("Profile not found for customer", { customerId });
     return;
   }
 
   analytics.capture({
     event: "User Subscribed",
-    distinctId: user.id,
+    distinctId: profile.clerkUserId,
   });
 };
 
@@ -49,15 +60,23 @@ const handleSubscriptionScheduleCanceled = async (
 
   const customerId =
     typeof data.customer === "string" ? data.customer : data.customer.id;
-  const user = await getUserFromCustomerId(customerId);
 
-  if (!user) {
+  // Update profile subscription status
+  const profile = await database.profile.update({
+    where: { stripeCustomerId: customerId },
+    data: {
+      subscriptionStatus: "canceled",
+    },
+  });
+
+  if (!profile) {
+    log.warn("Profile not found for customer", { customerId });
     return;
   }
 
   analytics.capture({
     event: "User Unsubscribed",
-    distinctId: user.id,
+    distinctId: profile.clerkUserId,
   });
 };
 

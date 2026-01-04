@@ -6,13 +6,43 @@ import type {
   UserJSON,
   WebhookEvent,
 } from "@repo/auth/server";
+import { database } from "@repo/database";
 import { log } from "@repo/observability/log";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { env } from "@/env";
 
-const handleUserCreated = (data: UserJSON) => {
+// Sync profile to database using Prisma upsert
+const syncProfileToDatabase = async (data: UserJSON) => {
+  const email = data.email_addresses.at(0)?.email_address ?? "";
+  const phoneNumber = data.phone_numbers.at(0)?.phone_number ?? null;
+
+  await database.profile.upsert({
+    where: { clerkUserId: data.id },
+    create: {
+      clerkUserId: data.id,
+      email,
+      firstName: data.first_name,
+      lastName: data.last_name,
+      avatarUrl: data.image_url,
+      phoneNumber,
+    },
+    update: {
+      email,
+      firstName: data.first_name,
+      lastName: data.last_name,
+      avatarUrl: data.image_url,
+      phoneNumber,
+    },
+  });
+};
+
+const handleUserCreated = async (data: UserJSON) => {
+  // Sync to local database
+  await syncProfileToDatabase(data);
+
+  // Track in analytics
   analytics.identify({
     distinctId: data.id,
     properties: {
@@ -33,7 +63,11 @@ const handleUserCreated = (data: UserJSON) => {
   return new Response("User created", { status: 201 });
 };
 
-const handleUserUpdated = (data: UserJSON) => {
+const handleUserUpdated = async (data: UserJSON) => {
+  // Sync to local database
+  await syncProfileToDatabase(data);
+
+  // Track in analytics
   analytics.identify({
     distinctId: data.id,
     properties: {
@@ -54,8 +88,15 @@ const handleUserUpdated = (data: UserJSON) => {
   return new Response("User updated", { status: 201 });
 };
 
-const handleUserDeleted = (data: DeletedObjectJSON) => {
+const handleUserDeleted = async (data: DeletedObjectJSON) => {
   if (data.id) {
+    // Soft-delete profile in database using Prisma
+    await database.profile.update({
+      where: { clerkUserId: data.id },
+      data: { deletedAt: new Date() },
+    });
+
+    // Track in analytics
     analytics.identify({
       distinctId: data.id,
       properties: {
@@ -195,15 +236,15 @@ export const POST = async (request: Request): Promise<Response> => {
 
   switch (eventType) {
     case "user.created": {
-      response = handleUserCreated(event.data);
+      response = await handleUserCreated(event.data);
       break;
     }
     case "user.updated": {
-      response = handleUserUpdated(event.data);
+      response = await handleUserUpdated(event.data);
       break;
     }
     case "user.deleted": {
-      response = handleUserDeleted(event.data);
+      response = await handleUserDeleted(event.data);
       break;
     }
     case "organization.created": {

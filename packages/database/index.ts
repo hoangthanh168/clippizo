@@ -7,9 +7,12 @@ import { PrismaClient } from "./generated/client";
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 // Use DIRECT_URL for database connection (bypasses connection pooler)
-const connectionString =
-  process.env.DIRECT_URL ||
-  "postgresql://postgres:eHBInh1K2tBAEZfZ@db.mnvraegclumofybqxbhp.supabase.co:5432/postgres";
+// Set in packages/database/.env and apps/*/.env.local
+const connectionString = process.env.DIRECT_URL;
+
+if (!connectionString) {
+  throw new Error("DIRECT_URL environment variable is required");
+}
 
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
