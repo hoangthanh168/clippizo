@@ -8,7 +8,19 @@
       "mcp__n8n-mcp__n8n_update_full_workflow",
       "mcp__n8n-mcp__n8n_validate_workflow",
       "mcp__n8n-mcp__n8n_update_partial_workflow",
-      "Bash(aws ec2 describe-instance-status:*)"
+      "Bash(aws ec2 describe-instance-status:*)",
+      "Bash(npm run build:*)",
+      "Bash(git checkout:*)",
+      "Bash(ls:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(for port in 3000 3001 3002 3003 3004 3005 6006)",
+      "Bash(do netstat -ano)",
+      "Bash(xargs:*)",
+      "Bash(done)",
+      "Bash(npm run dev:*)",
+      "Bash(cat:*)",
+      "Bash(cmd.exe /c \"for /f \"\"tokens=5\"\" %a in \\(''netstat -ano ^| findstr :3004''\\) do taskkill /F /PID %a\")"
     ]
   }
 }
