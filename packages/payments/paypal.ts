@@ -19,6 +19,11 @@ function getClient(): Client {
   if (client) return client;
 
   const env = keys();
+
+  if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_CLIENT_SECRET) {
+    throw new Error("PayPal credentials not configured");
+  }
+
   const environment =
     env.PAYPAL_MODE === "live" ? Environment.Production : Environment.Sandbox;
 

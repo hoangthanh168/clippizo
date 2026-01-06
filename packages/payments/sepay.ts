@@ -37,6 +37,11 @@ export async function createSePayCheckout(
   const { planId, profileId, isRenewal, successUrl, errorUrl, cancelUrl } =
     params;
   const env = keys();
+
+  if (!env.SEPAY_MERCHANT_ID || !env.SEPAY_SECRET_KEY) {
+    throw new Error("SePay credentials not configured");
+  }
+
   const amount = getPlanPrice(planId, "VND");
   const invoiceNumber = `CLZ-${Date.now()}-${profileId.slice(-6)}`;
 
@@ -101,6 +106,10 @@ export function verifySePayIPN(
   body: unknown
 ): VerifyIPNResult {
   const env = keys();
+
+  if (!env.SEPAY_SECRET_KEY) {
+    return { isValid: false, error: "SePay secret key not configured" };
+  }
 
   // Verify secret key matches
   if (secretKey !== env.SEPAY_SECRET_KEY) {
