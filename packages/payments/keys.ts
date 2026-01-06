@@ -4,15 +4,15 @@ import { z } from 'zod';
 export const keys = () =>
   createEnv({
     server: {
-      // PayPal
-      PAYPAL_CLIENT_ID: z.string().min(1),
-      PAYPAL_CLIENT_SECRET: z.string().min(1),
+      // PayPal (optional for initial deployment)
+      PAYPAL_CLIENT_ID: z.string().optional(),
+      PAYPAL_CLIENT_SECRET: z.string().optional(),
       PAYPAL_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
       PAYPAL_WEBHOOK_ID: z.string().optional(),
 
-      // SePay
-      SEPAY_MERCHANT_ID: z.string().min(1),
-      SEPAY_SECRET_KEY: z.string().min(1),
+      // SePay (optional for initial deployment)
+      SEPAY_MERCHANT_ID: z.string().optional(),
+      SEPAY_SECRET_KEY: z.string().optional(),
       SEPAY_MODE: z.enum(['sandbox', 'production']).default('sandbox'),
     },
     runtimeEnv: {
