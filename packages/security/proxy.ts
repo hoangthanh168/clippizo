@@ -9,7 +9,7 @@ export const noseconeOptions: Options = {
   ...defaults,
   // Content Security Policy (CSP) is disabled by default because the values
   // depend on which Next Forge features are enabled. See
-  // https://www.next-forge.com/packages/security/headers for guidance on how
+  // https://www.clippizo.com/packages/security/headers for guidance on how
   // to configure it.
   contentSecurityPolicy: false,
 };
