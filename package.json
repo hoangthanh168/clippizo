@@ -1,6 +1,7 @@
 {
   "name": "clippizo",
   "version": "5.3.2",
+  "description": "AI-powered video creation platform",
   "bin": {
     "clippizo": "dist/index.js"
   },

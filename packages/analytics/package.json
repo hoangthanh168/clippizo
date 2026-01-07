@@ -1,5 +1,6 @@
 {
   "name": "@repo/analytics",
+  "description": "Usage tracking and AI generation analytics",
   "version": "0.0.0",
   "private": true,
   "scripts": {

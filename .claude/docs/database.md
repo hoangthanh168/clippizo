@@ -2,6 +2,10 @@
 
 Schema managed via Prisma at `packages/database/prisma/schema.prisma`
 
+## About
+
+The database stores all data for the Clippizo AI video creation platform, including user profiles, AI-generated content, video assets, and subscription information.
+
 ## Database Schema
 
 ```

@@ -1,5 +1,6 @@
 {
   "name": "storybook",
+  "description": "UI component library for Clippizo design system",
   "version": "0.1.0",
   "private": true,
   "scripts": {

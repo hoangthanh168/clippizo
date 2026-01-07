@@ -1,5 +1,6 @@
 {
   "name": "@repo/design-system",
+  "description": "Clippizo UI components and design tokens",
   "version": "0.0.0",
   "private": true,
   "scripts": {

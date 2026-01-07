@@ -1,5 +1,6 @@
 {
   "name": "@repo/database",
+  "description": "Data models for users, content, AI generations, subscriptions",
   "version": "0.0.0",
   "main": "./index.ts",
   "types": "./index.ts",

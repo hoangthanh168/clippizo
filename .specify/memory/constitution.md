@@ -25,6 +25,8 @@
 
 # Clippizo Constitution
 
+**Clippizo** is a SaaS platform providing AI-powered tools for video creation, including AI image generation, AI video generation, content management, and AI chatbot assistance. Built for content creators and video producers.
+
 ## Core Principles
 
 ### I. Fast

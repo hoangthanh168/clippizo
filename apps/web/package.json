@@ -1,5 +1,6 @@
 {
   "name": "web",
+  "description": "Marketing website showcasing Clippizo AI video capabilities",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",

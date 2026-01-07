@@ -1,5 +1,6 @@
 {
   "name": "@repo/ai",
+  "description": "AI service integrations (image generation, video generation, chatbot)",
   "version": "0.0.0",
   "private": true,
   "scripts": {

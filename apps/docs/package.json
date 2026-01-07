@@ -1,5 +1,6 @@
 {
   "name": "docs",
+  "description": "Documentation for Clippizo platform and API",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3004",

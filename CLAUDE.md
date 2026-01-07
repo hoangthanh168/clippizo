@@ -2,6 +2,17 @@
 
 This file provides guidance to Claude Code when working with this repository.
 
+## About Clippizo
+
+**Clippizo** is a SaaS platform providing AI-powered tools for video creation. The platform includes:
+
+- **AI Image Generation** - Create images using AI for video content
+- **AI Video Generation** - Generate video clips and sequences with AI
+- **Content Management** - Organize and manage created assets
+- **AI Chatbot** - Assist creators with workflow and content suggestions
+
+Built for **content creators and video producers** who want to leverage AI for efficient video production. Similar in concept to Higgsfield.ai.
+
 ## Key Principles
 
 - **Constitution**: `.specify/memory/constitution.md` (Fast, Cheap, Opinionated, Modern, Safe)

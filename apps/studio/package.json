@@ -1,5 +1,6 @@
 {
   "name": "studio",
+  "description": "Admin studio for platform management",
   "version": "0.0.0",
   "scripts": {
     "dev": "prisma studio --config ../../packages/database/prisma.config.ts --port 3005",

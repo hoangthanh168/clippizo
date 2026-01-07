@@ -1,16 +1,21 @@
-# ▲ / clippizo
+# Clippizo
 
-**Production-grade Turborepo template for Next.js apps.**
+**AI-powered video creation platform**
 
 ## Overview
 
-[clippizo](https://github.com/clippizo/clippizo) is a production-grade [Turborepo](https://turborepo.com) template for [Next.js](https://nextjs.org/) apps. It's designed to be a comprehensive starting point for building SaaS applications, providing a solid, opinionated foundation with minimal configuration required.
+[Clippizo](https://clippizo.com) is a SaaS platform providing AI-powered tools for video creation. The platform includes:
 
-Built on a decade of experience building web applications, clippizo balances speed and quality to help you ship thoroughly-built products faster.
+- **AI Image Generation** - Create images using AI for video content
+- **AI Video Generation** - Generate video clips and sequences with AI
+- **Content Management** - Organize and manage created assets
+- **AI Chatbot** - Assist creators with workflow and content suggestions
+
+Built for **content creators and video producers** who want to leverage AI for efficient video production. Similar in concept to Higgsfield.ai.
 
 ### Philosophy
 
-clippizo is built around five core principles:
+Clippizo is built around five core principles:
 
 - **Fast** — Quick to build, run, deploy, and iterate on
 - **Cheap** — Free to start with services that scale with you
@@ -20,61 +25,60 @@ clippizo is built around five core principles:
 
 ## Demo
 
-Experience clippizo in action:
+Experience Clippizo in action:
 
-- [Web](https://demo.clippizo.com) — Marketing website
-- [App](https://app.demo.clippizo.com) — Main application
-- [Storybook](https://storybook.demo.clippizo.com) — Component library
-- [API](https://api.demo.clippizo.com/health) — API health check
+- [Web](https://clippizo.com) — Marketing website
+- [App](https://app.clippizo.com) — Main application
+- [Storybook](https://storybook.clippizo.com) — Component library
+- [API](https://api.clippizo.com/health) — API health check
 
 ## Features
 
-clippizo comes with batteries included:
-
 ### Apps
 
-- **Web** — Marketing site built with Tailwind CSS and TWBlocks
-- **App** — Main application with authentication and database integration
-- **API** — RESTful API with health checks and monitoring
-- **Docs** — Documentation site powered by Mintlify
-- **Email** — Email templates with React Email
-- **Storybook** — Component development environment
+- **App** — Main Clippizo dashboard for AI video creation tools
+- **Web** — Marketing site showcasing AI video capabilities
+- **API** — Backend API for AI generation services and content management
+- **Docs** — Platform and API documentation
+- **Email** — Email templates for notifications and marketing
+- **Storybook** — UI component library for Clippizo design system
 
 ### Packages
 
+- **AI** — AI service integrations (image generation, video generation, chatbot)
+- **Database** — Data models for users, content, AI generations, subscriptions
 - **Authentication** — Powered by [Clerk](https://clerk.com)
-- **Database** — Type-safe ORM with migrations
-- **Design System** — Comprehensive component library with dark mode
-- **Payments** — One-time subscriptions via [PayPal](https://paypal.com) (international) and [SePay](https://sepay.vn) (Vietnam)
+- **Design System** — Clippizo UI components and design tokens
+- **Payments** — Subscriptions via [PayPal](https://paypal.com) (international) and [SePay](https://sepay.vn) (Vietnam)
 - **Email** — Transactional emails via [Resend](https://resend.com)
-- **Analytics** — Web ([Google Analytics](https://developers.google.com/analytics)) and product ([Posthog](https://posthog.com))
-- **Observability** — Error tracking ([Sentry](https://sentry.io)), logging, and uptime monitoring ([BetterStack](https://betterstack.com))
-- **Security** — Application security ([Arcjet](https://arcjet.com)), rate limiting, and secure headers
-- **CMS** — Type-safe content management for blogs and documentation
-- **SEO** — Metadata management, sitemaps, and JSON-LD
-- **AI** — AI integration utilities
+- **Analytics** — Usage tracking and AI generation analytics
+- **Observability** — Error tracking ([Sentry](https://sentry.io)), logging, and monitoring
+- **Security** — Application security ([Arcjet](https://arcjet.com)), rate limiting
+- **Storage** — File upload and asset management
 - **Webhooks** — Inbound and outbound webhook handling
-- **Collaboration** — Real-time features with avatars and live cursors
-- **Feature Flags** — Feature flag management
-- **Cron** — Scheduled job management
-- **Storage** — File upload and management
-- **Internationalization** — Multi-language support
-- **Notifications** — In-app notification system
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 20+
-- [pnpm](https://pnpm.io) (or npm/yarn/bun)
+- npm (or pnpm/yarn/bun)
 - [ngrok](https://ngrok.com) or similar for local webhook testing
 
-### Installation
+### Development
 
-Create a new clippizo project:
+```bash
+# Install dependencies
+npm install
 
-```sh
-npx clippizo@latest init
+# Start all apps
+npm run dev
+
+# Start specific app
+npm run dev --filter app       # Main app (port 3000)
+npm run dev --filter web       # Marketing site (port 3001)
+npm run dev --filter api       # API server (port 3002)
+npm run dev --filter storybook # Component library (port 6006)
 ```
 
 ### Setup
@@ -83,22 +87,23 @@ npx clippizo@latest init
 2. Set up required service accounts (Clerk, PayPal, SePay, Resend, etc.)
 3. Run the development server
 
-For detailed setup instructions, read the [documentation](https://www.clippizo.com/docs).
+For detailed setup instructions, read the [documentation](https://clippizo.com/docs).
 
 ## Structure
 
-clippizo uses a monorepo structure managed by Turborepo:
+Clippizo uses a monorepo structure managed by Turborepo:
 
 ```
 clippizo/
 ├── apps/           # Deployable applications
+│   ├── app/        # Main application - AI video creation dashboard (port 3000)
 │   ├── web/        # Marketing website (port 3001)
-│   ├── app/        # Main application (port 3000)
-│   ├── api/        # API server
-│   ├── docs/       # Documentation
+│   ├── api/        # Backend API for AI services (port 3002)
+│   ├── docs/       # Platform documentation
 │   ├── email/      # Email templates
-│   └── storybook/  # Component library
+│   └── storybook/  # Component library (port 6006)
 └── packages/       # Shared packages
+    ├── ai/         # AI service integrations
     ├── design-system/
     ├── database/
     ├── auth/
@@ -109,25 +114,12 @@ Each app is self-contained and independently deployable. Packages are shared acr
 
 ## Documentation
 
-Full documentation is available at [clippizo.com/docs](https://www.clippizo.com/docs), including:
+Full documentation is available at [clippizo.com/docs](https://clippizo.com/docs), including:
 
-- Detailed setup guides
-- Package documentation
-- Migration guides for swapping providers
+- Platform guides
+- API documentation
+- AI integration examples
 - Deployment instructions
-- Examples and recipes
-
-## Contributing
-
-We welcome contributions! See the [contributing guide](https://github.com/clippizo/clippizo/blob/main/.github/CONTRIBUTING.md) for details.
-
-## Contributors
-
-<a href="https://github.com/clippizo/clippizo/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=clippizo/clippizo" />
-</a>
-
-Made with [contrib.rocks](https://contrib.rocks).
 
 ## License
 

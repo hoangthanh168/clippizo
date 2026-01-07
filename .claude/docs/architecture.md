@@ -1,23 +1,28 @@
 # Architecture
 
+## About Clippizo
+
+Clippizo is a SaaS platform providing AI-powered tools for video creation, including AI image generation, AI video generation, content management, and AI chatbot assistance.
+
 ## File Organization
 
 ```
 apps/           # Deployable Next.js applications
-├── app         # Main app (port 3000)
-├── web         # Marketing site (port 3001)
-├── api         # API server (port 3002)
-├── docs        # Documentation
-├── email       # Email templates
-├── storybook   # Component library (port 6006)
-└── studio      # Admin studio
+├── app         # Main Clippizo dashboard - AI video creation tools (port 3000)
+├── web         # Marketing site - showcases AI video capabilities (port 3001)
+├── api         # Backend API - AI generation services and content management (port 3002)
+├── docs        # Platform and API documentation
+├── email       # Email templates for notifications and marketing
+├── storybook   # Component library for Clippizo design system (port 6006)
+└── studio      # Admin studio for platform management
 
 packages/       # Shared code
-├── design-system
-├── database
-├── auth
-├── payments
-├── analytics
+├── ai          # AI service integrations (image gen, video gen, chatbot)
+├── design-system # Clippizo UI components and design tokens
+├── database    # Data models (users, content, AI generations, subscriptions)
+├── auth        # Authentication via Clerk
+├── payments    # PayPal + SePay subscription handling
+├── analytics   # Usage tracking and AI generation analytics
 └── ...
 ```
 
