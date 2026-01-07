@@ -50,3 +50,21 @@ When setting up database:
 1. Copy values to `packages/database/.env` (for Prisma CLI)
 2. Copy SAME values to `apps/app/.env.local` (for runtime)
 3. Update other apps if they use database: `apps/api/.env.local`, `apps/web/.env.local`
+
+## Exception: apps/studio
+
+`apps/studio` runs `prisma studio` command (CLI tool), NOT Next.js runtime. The `dotenv/config` in `prisma.config.ts` only reads `.env` files, not `.env.local`.
+
+**Required files for studio:**
+| File | Purpose |
+|------|---------|
+| `apps/studio/.env` | Prisma CLI (`dotenv/config`) - **REQUIRED** |
+| `apps/studio/.env.local` | Next.js runtime (if applicable) |
+
+```bash
+# apps/studio/.env (copy from packages/database/.env)
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
+```
+
+**Why this happens**: When `prisma studio` runs from `apps/studio` directory, `dotenv/config` looks for `.env` in the current working directory, not `.env.local`.
