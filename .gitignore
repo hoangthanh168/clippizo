@@ -278,3 +278,6 @@ packages/database/generated
 .content-collections
 .source/
 .sourcen8n/
+
+# Claude Code secrets
+.claude/secrets.local.md
