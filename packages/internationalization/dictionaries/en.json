@@ -1,14 +1,14 @@
 {
   "web": {
     "global": {
-      "primaryCta": "Book a call",
+      "primaryCta": "Try for free",
       "secondaryCta": "Sign up"
     },
     "header": {
       "home": "Home",
       "product": {
         "title": "Product",
-        "description": "Managing a small business today is already tough.",
+        "description": "AI-powered video creation for content creators.",
         "pricing": "Pricing"
       },
       "blog": "Blog",
@@ -19,169 +19,169 @@
     },
     "home": {
       "meta": {
-        "title": "Transform Your Business Operations Today",
-        "description": "In today's fast-paced world, your business deserves better than outdated trading systems. Our innovative platform streamlines operations, reduces complexity, and helps small businesses thrive in the modern economy."
+        "title": "Create Stunning Videos with AI",
+        "description": "Transform your creative ideas into professional videos with Clippizo's AI-powered video generation platform. Built for YouTubers, social media creators, and video producers who want to leverage AI for efficient content production."
       },
       "hero": {
         "announcement": "Read our latest article"
       },
       "cases": {
-        "title": "Empowering Success Stories Across the Globe"
+        "title": "Trusted by Content Creators Worldwide"
       },
       "features": {
-        "title": "Powerful Tools for Modern Business",
-        "description": "Discover how our cutting-edge features can revolutionize your daily operations.",
+        "title": "AI-Powered Video Creation Suite",
+        "description": "Everything you need to create professional videos with the power of artificial intelligence.",
         "items": [
           {
-            "title": "Streamlined Operations",
-            "description": "Our platform streamlines operations, reduces complexity, and helps small businesses thrive in the modern economy."
+            "title": "AI Video Generation",
+            "description": "Transform your ideas into stunning videos with our advanced AI. Create professional clips, sequences, and full videos in minutes, not hours."
           },
           {
-            "title": "Real-Time Analytics",
-            "description": "Get instant insights into your business performance with comprehensive analytics and reporting tools."
+            "title": "AI Image Creation",
+            "description": "Generate high-quality images for your content with AI. Perfect for thumbnails, social posts, and video assets."
           },
           {
-            "title": "Automated Workflows",
-            "description": "Save time and reduce errors with intelligent automation that handles repetitive tasks for you."
+            "title": "Content Management",
+            "description": "Organize and manage all your AI-created assets in one place. Easy search, tagging, and export for seamless workflows."
           },
           {
-            "title": "Secure Transactions",
-            "description": "Rest easy knowing your business operations are protected by enterprise-grade security and encryption."
+            "title": "AI Creative Assistant",
+            "description": "Get intelligent suggestions for your content. Our AI chatbot helps with ideas, scripts, and creative direction."
           }
         ]
       },
       "stats": {
-        "title": "Real Results, Real Impact",
-        "description": "Join thousands of businesses that have transformed their operations with our platform. Our solutions have helped companies reduce administrative overhead by 60% and increase trading efficiency by 45% on average.",
+        "title": "Powering Creator Success",
+        "description": "Join thousands of content creators who have transformed their workflow with AI. Our platform helps creators produce more content in less time while maintaining professional quality.",
         "items": [
           {
-            "title": "Monthly active users",
-            "metric": "100000",
+            "title": "Videos generated",
+            "metric": "50000",
+            "delta": "25",
+            "type": "unit"
+          },
+          {
+            "title": "Active creators",
+            "metric": "5000",
+            "delta": "15",
+            "type": "unit"
+          },
+          {
+            "title": "Images created",
+            "metric": "200000",
+            "delta": "30",
+            "type": "unit"
+          },
+          {
+            "title": "Time saved",
+            "metric": "80",
             "delta": "10",
-            "type": "unit"
-          },
-          {
-            "title": "Daily active users",
-            "metric": "10000",
-            "delta": "-5",
-            "type": "unit"
-          },
-          {
-            "title": "Monthly recurring revenue",
-            "metric": "100000",
-            "delta": "20",
-            "type": "currency"
-          },
-          {
-            "title": "Cost per acquisition",
-            "metric": "100",
-            "delta": "-10",
-            "type": "currency"
+            "type": "percentage"
           }
         ]
       },
       "testimonials": {
-        "title": "Hear from Our Thriving Community",
+        "title": "Loved by Content Creators",
         "items": [
           {
-            "title": "Best decision",
-            "description": "Our goal was to streamline SMB trade, making it easier and faster than ever and we did it together.",
+            "title": "10x faster content",
+            "description": "Clippizo cut my video production time from days to hours. The AI video generation is incredibly intuitive and the results are professional quality.",
             "author": {
-              "name": "Hayden Bleasel",
-              "image": "https://github.com/haydenbleasel.png"
+              "name": "Alex Chen",
+              "image": "https://ui-avatars.com/api/?name=Alex+Chen&background=6366f1&color=fff"
             }
           },
           {
-            "title": "Game changer",
-            "description": "This platform revolutionized how we handle our day-to-day operations. The efficiency gains have been remarkable.",
+            "title": "Perfect for thumbnails",
+            "description": "The AI image generation is a game-changer for my YouTube channel. I create eye-catching thumbnails in seconds instead of spending hours in Photoshop.",
             "author": {
-              "name": "Lee Robinson",
-              "image": "https://github.com/leerob.png"
+              "name": "Sarah Miller",
+              "image": "https://ui-avatars.com/api/?name=Sarah+Miller&background=ec4899&color=fff"
             }
           },
           {
-            "title": "Exceeded expectations",
-            "description": "Implementation was smooth and the results were immediate. Our team adapted quickly and productivity soared.",
+            "title": "My creative partner",
+            "description": "The AI assistant helps me brainstorm content ideas and write scripts. It's like having a creative partner available 24/7.",
             "author": {
-              "name": "shadcn",
-              "image": "https://github.com/shadcn.png"
+              "name": "James Wilson",
+              "image": "https://ui-avatars.com/api/?name=James+Wilson&background=10b981&color=fff"
             }
           },
           {
-            "title": "Outstanding support",
-            "description": "Not only is the platform powerful, but the customer support team has been exceptional in helping us maximize its potential.",
+            "title": "All-in-one solution",
+            "description": "Finally, a platform that handles video generation, image creation, and content management in one place. Clippizo simplified my entire workflow.",
             "author": {
-              "name": "Pontus Abrahamsson",
-              "image": "https://github.com/pontusab.png"
+              "name": "Maria Garcia",
+              "image": "https://ui-avatars.com/api/?name=Maria+Garcia&background=f59e0b&color=fff"
             }
           }
         ]
       },
       "faq": {
-        "title": "Common Questions, Expert Answers",
-        "description": "Get quick answers to your most pressing questions about our platform. We've compiled everything you need to know about transforming your business operations and getting started with modern trading solutions.",
-        "cta": "Any questions? Reach out",
+        "title": "Frequently Asked Questions",
+        "description": "Get quick answers to common questions about Clippizo's AI content creation tools. Learn how our platform can help you create videos and images faster than ever.",
+        "cta": "Still have questions? Contact us",
         "items": [
           {
-            "question": "What is the platform?",
-            "answer": "The platform is a trading platform that allows you to trade with confidence."
+            "question": "What is Clippizo?",
+            "answer": "Clippizo is an AI-powered content creation platform for video creators. It includes AI video generation, AI image creation, content management, and an AI creative assistant to help you produce professional content faster."
           },
           {
-            "question": "How secure is the platform?",
-            "answer": "Our platform employs enterprise-grade security measures, including end-to-end encryption and multi-factor authentication, to ensure your trading activities remain completely secure."
+            "question": "How does AI video generation work?",
+            "answer": "Our AI analyzes your input (text prompts, scripts, or reference materials) and generates video clips and sequences. You can customize styles, durations, and formats to match your creative vision."
           },
           {
-            "question": "What trading features are available?",
-            "answer": "The platform offers comprehensive trading tools including real-time market data, advanced charting, automated trading strategies, and detailed analytics to support informed decision-making."
+            "question": "What video and image formats are supported?",
+            "answer": "We support all major formats including MP4, MOV, WebM for videos, and PNG, JPG, WebP for images. You can export in various resolutions from social media optimized to 4K quality."
           },
           {
-            "question": "How does pricing work?",
-            "answer": "We offer flexible pricing tiers designed to scale with your business needs, from starter plans for individual traders to enterprise solutions for large organizations."
+            "question": "How much does Clippizo cost?",
+            "answer": "We offer flexible plans starting with a free tier for beginners. Paid plans unlock more AI generation credits, higher resolution exports, and advanced features. Check our pricing page for details."
           },
           {
-            "question": "What kind of support do you provide?",
-            "answer": "Our dedicated support team is available 24/7 through multiple channels including live chat, email, and phone. We also provide extensive documentation and training resources."
+            "question": "What AI models power Clippizo?",
+            "answer": "Clippizo leverages state-of-the-art AI models for video and image generation. We continuously update our models to provide the best quality and latest capabilities in AI content creation."
           }
         ]
       },
       "cta": {
-        "title": "Start Your Business Transformation",
-        "description": "Join thousands of forward-thinking businesses who have already modernized their operations. Our platform offers the tools, support, and efficiency you need to succeed in today's competitive market. Get started in minutes."
+        "title": "Start Creating with AI Today",
+        "description": "Join thousands of content creators who are already using AI to produce stunning videos. Sign up now and experience the future of content creation. No credit card required to get started."
       }
     },
     "blog": {
       "meta": {
         "title": "Blog",
-        "description": "Thoughts, ideas, and opinions."
+        "description": "Tips, tutorials, and insights for content creators using AI tools."
       }
     },
     "contact": {
       "meta": {
-        "title": "Let's Talk About Your Business",
-        "description": "Schedule a consultation with our team to discuss how we can help streamline your operations and drive growth for your business."
+        "title": "Let's Create Together",
+        "description": "Schedule a demo with our team to see how Clippizo can transform your content creation workflow with AI."
       },
       "hero": {
         "benefits": [
           {
-            "title": "Personalized Consultation",
-            "description": "Get tailored solutions and expert advice specific to your business needs."
+            "title": "Personalized Demo",
+            "description": "See how AI video generation can work for your specific content needs and creative style."
           },
           {
-            "title": "Seamless Integration",
-            "description": "We seamlessly integrate with your existing systems to ensure a smooth transition and minimal disruption."
+            "title": "Workflow Optimization",
+            "description": "Learn how to integrate Clippizo into your existing content creation process for maximum efficiency."
           },
           {
-            "title": "Expert Guidance",
-            "description": "Our team of experts will guide you through the process, ensuring you get the most out of our platform."
+            "title": "Creator Support",
+            "description": "Our team of content creation experts will help you get the most out of AI-powered tools."
           }
         ],
         "form": {
-          "title": "Book a meeting",
+          "title": "Book a demo",
           "date": "Date",
           "firstName": "First name",
           "lastName": "Last name",
-          "resume": "Upload resume",
-          "cta": "Book the meeting"
+          "resume": "Portfolio link (optional)",
+          "cta": "Book the demo"
         }
       }
     }
