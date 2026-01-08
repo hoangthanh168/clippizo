@@ -1,8 +1,8 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
 const PLANS = {
   free: {
@@ -15,7 +15,7 @@ const PLANS = {
   pro: {
     id: "pro",
     name: "Pro",
-    priceVND: 99000,
+    priceVND: 99_000,
     priceUSD: 9.99,
     features: [
       "Full access",
@@ -28,7 +28,7 @@ const PLANS = {
   enterprise: {
     id: "enterprise",
     name: "Enterprise",
-    priceVND: 299000,
+    priceVND: 299_000,
     priceUSD: 29.99,
     features: [
       "Everything in Pro",
@@ -123,7 +123,7 @@ function PricingContent() {
   return (
     <div className="container mx-auto max-w-6xl px-4 py-12">
       <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold">
+        <h1 className="mb-4 font-bold text-4xl">
           {isRenewal ? "Renew Your Subscription" : "Choose Your Plan"}
         </h1>
         <p className="mx-auto max-w-2xl text-muted-foreground">
@@ -135,24 +135,24 @@ function PricingContent() {
         {/* Currency toggle */}
         <div className="mt-6 flex items-center justify-center gap-4">
           <button
-            type="button"
-            onClick={() => setCurrency("VND")}
             className={`rounded-md px-4 py-2 text-sm ${
               currency === "VND"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted"
             }`}
+            onClick={() => setCurrency("VND")}
+            type="button"
           >
             VND (SePay)
           </button>
           <button
-            type="button"
-            onClick={() => setCurrency("USD")}
             className={`rounded-md px-4 py-2 text-sm ${
               currency === "USD"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted"
             }`}
+            onClick={() => setCurrency("USD")}
+            type="button"
           >
             USD (PayPal)
           </button>
@@ -160,25 +160,25 @@ function PricingContent() {
       </div>
 
       <div
-        className={`grid gap-8 ${filteredPlans.length === 1 ? "max-w-md mx-auto" : filteredPlans.length === 2 ? "md:grid-cols-2 max-w-3xl mx-auto" : "md:grid-cols-3"}`}
+        className={`grid gap-8 ${filteredPlans.length === 1 ? "mx-auto max-w-md" : filteredPlans.length === 2 ? "mx-auto max-w-3xl md:grid-cols-2" : "md:grid-cols-3"}`}
       >
         {filteredPlans.map((plan) => (
           <div
-            key={plan.id}
             className={`flex flex-col rounded-xl border p-6 ${
               plan.id === "pro" ? "border-primary shadow-lg" : ""
             }`}
+            key={plan.id}
           >
             {plan.id === "pro" && (
-              <span className="mb-4 self-start rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground">
+              <span className="mb-4 self-start rounded-full bg-primary px-3 py-1 text-primary-foreground text-xs">
                 Most Popular
               </span>
             )}
 
-            <h2 className="mb-2 text-2xl font-bold">{plan.name}</h2>
+            <h2 className="mb-2 font-bold text-2xl">{plan.name}</h2>
 
             <div className="mb-6">
-              <span className="text-4xl font-bold">{formatPrice(plan)}</span>
+              <span className="font-bold text-4xl">{formatPrice(plan)}</span>
               {plan.id !== "free" && (
                 <span className="text-muted-foreground">/month</span>
               )}
@@ -186,7 +186,7 @@ function PricingContent() {
 
             <ul className="mb-8 flex-1 space-y-3">
               {plan.features.map((feature) => (
-                <li key={feature} className="flex items-center gap-2">
+                <li className="flex items-center gap-2" key={feature}>
                   <Check className="h-5 w-5 text-green-500" />
                   <span className="text-sm">{feature}</span>
                 </li>
@@ -195,9 +195,9 @@ function PricingContent() {
 
             {plan.id === "free" ? (
               <button
-                type="button"
-                onClick={() => router.push("/")}
                 className="rounded-md border py-3 text-center"
+                onClick={() => router.push("/")}
+                type="button"
               >
                 Current Plan
               </button>
@@ -205,10 +205,10 @@ function PricingContent() {
               <div className="space-y-2">
                 {currency === "VND" ? (
                   <button
-                    type="button"
-                    onClick={() => handleSePayCheckout(plan.id)}
-                    disabled={loading !== null}
                     className="flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3 text-primary-foreground disabled:opacity-50"
+                    disabled={loading !== null}
+                    onClick={() => handleSePayCheckout(plan.id)}
+                    type="button"
                   >
                     {loading === `sepay-${plan.id}` ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
@@ -218,10 +218,10 @@ function PricingContent() {
                   </button>
                 ) : (
                   <button
-                    type="button"
-                    onClick={() => handlePayPalCheckout(plan.id)}
-                    disabled={loading !== null}
                     className="flex w-full items-center justify-center gap-2 rounded-md bg-[#0070ba] py-3 text-white disabled:opacity-50"
+                    disabled={loading !== null}
+                    onClick={() => handlePayPalCheckout(plan.id)}
+                    type="button"
                   >
                     {loading === `paypal-${plan.id}` ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
@@ -236,14 +236,14 @@ function PricingContent() {
         ))}
       </div>
 
-      <div className="mt-12 text-center text-sm text-muted-foreground">
+      <div className="mt-12 text-center text-muted-foreground text-sm">
         <p>
           Subscriptions are one-time payments valid for 30 days. Renew manually
           before expiry to maintain access.
         </p>
         <p className="mt-2">
           Need help?{" "}
-          <a href="mailto:support@clippizo.com" className="text-primary">
+          <a className="text-primary" href="mailto:support@clippizo.com">
             Contact support
           </a>
         </p>
@@ -254,7 +254,13 @@ function PricingContent() {
 
 export default function PricingPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      }
+    >
       <PricingContent />
     </Suspense>
   );

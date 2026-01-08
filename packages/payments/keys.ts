@@ -1,5 +1,5 @@
-import { createEnv } from '@t3-oss/env-nextjs';
-import { z } from 'zod';
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
 
 export const keys = () =>
   createEnv({
@@ -7,13 +7,13 @@ export const keys = () =>
       // PayPal (optional for initial deployment)
       PAYPAL_CLIENT_ID: z.string().optional(),
       PAYPAL_CLIENT_SECRET: z.string().optional(),
-      PAYPAL_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
+      PAYPAL_MODE: z.enum(["sandbox", "live"]).default("sandbox"),
       PAYPAL_WEBHOOK_ID: z.string().optional(),
 
       // SePay (optional for initial deployment)
       SEPAY_MERCHANT_ID: z.string().optional(),
       SEPAY_SECRET_KEY: z.string().optional(),
-      SEPAY_MODE: z.enum(['sandbox', 'production']).default('sandbox'),
+      SEPAY_MODE: z.enum(["sandbox", "production"]).default("sandbox"),
     },
     runtimeEnv: {
       // PayPal

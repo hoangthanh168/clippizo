@@ -20,49 +20,49 @@ export const FAQ = ({ dictionary }: FAQProps) => {
   const mounted = useMounted();
 
   return (
-  <div className="w-full py-20 lg:py-40">
-    <div className="container mx-auto">
-      <div className="grid gap-10 lg:grid-cols-2">
-        <div className="flex flex-col gap-10">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <h4 className="max-w-xl text-left font-regular text-3xl tracking-tighter md:text-5xl">
-                {dictionary.web.home.faq.title}
-              </h4>
-              <p className="max-w-xl text-left text-lg text-muted-foreground leading-relaxed tracking-tight lg:max-w-lg">
-                {dictionary.web.home.faq.description}
-              </p>
-            </div>
-            <div className="">
-              <Button asChild className="gap-4" variant="outline">
-                <Link href="/contact">
-                  {dictionary.web.home.faq.cta}{" "}
-                  <PhoneCall className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-        {mounted ? (
-          <Accordion className="w-full" collapsible type="single">
-            {dictionary.web.home.faq.items.map((item, index) => (
-              <AccordionItem key={index} value={`index-${index}`}>
-                <AccordionTrigger>{item.question}</AccordionTrigger>
-                <AccordionContent>{item.answer}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        ) : (
-          <div className="w-full space-y-4">
-            {dictionary.web.home.faq.items.map((item, index) => (
-              <div key={index} className="border-b pb-4">
-                <p className="font-medium">{item.question}</p>
+    <div className="w-full py-20 lg:py-40">
+      <div className="container mx-auto">
+        <div className="grid gap-10 lg:grid-cols-2">
+          <div className="flex flex-col gap-10">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <h4 className="max-w-xl text-left font-regular text-3xl tracking-tighter md:text-5xl">
+                  {dictionary.web.home.faq.title}
+                </h4>
+                <p className="max-w-xl text-left text-lg text-muted-foreground leading-relaxed tracking-tight lg:max-w-lg">
+                  {dictionary.web.home.faq.description}
+                </p>
               </div>
-            ))}
+              <div className="">
+                <Button asChild className="gap-4" variant="outline">
+                  <Link href="/contact">
+                    {dictionary.web.home.faq.cta}{" "}
+                    <PhoneCall className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
-        )}
+          {mounted ? (
+            <Accordion className="w-full" collapsible type="single">
+              {dictionary.web.home.faq.items.map((item, index) => (
+                <AccordionItem key={index} value={`index-${index}`}>
+                  <AccordionTrigger>{item.question}</AccordionTrigger>
+                  <AccordionContent>{item.answer}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div className="w-full space-y-4">
+              {dictionary.web.home.faq.items.map((item, index) => (
+                <div className="border-b pb-4" key={index}>
+                  <p className="font-medium">{item.question}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  </div>
   );
 };

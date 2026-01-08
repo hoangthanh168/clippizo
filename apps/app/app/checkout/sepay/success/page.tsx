@@ -1,8 +1,8 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
 import { CheckCircle, Loader2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 function SePaySuccessContent() {
   const searchParams = useSearchParams();
@@ -31,27 +31,25 @@ function SePaySuccessContent() {
         <CheckCircle className="h-16 w-16 text-green-500" />
       </div>
 
-      <h1 className="mb-2 text-2xl font-bold">Payment Successful!</h1>
+      <h1 className="mb-2 font-bold text-2xl">Payment Successful!</h1>
 
       <p className="mb-4 text-muted-foreground">
         Thank you for your purchase. Your subscription has been activated.
       </p>
 
       {invoice && (
-        <p className="mb-6 text-sm text-muted-foreground">
-          Invoice: {invoice}
-        </p>
+        <p className="mb-6 text-muted-foreground text-sm">Invoice: {invoice}</p>
       )}
 
-      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+      <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
         <Loader2 className="h-4 w-4 animate-spin" />
         <span>Redirecting to billing in {countdown}s...</span>
       </div>
 
       <button
-        type="button"
+        className="mt-4 text-primary text-sm underline"
         onClick={() => router.push("/billing")}
-        className="mt-4 text-sm text-primary underline"
+        type="button"
       >
         Go to billing now
       </button>

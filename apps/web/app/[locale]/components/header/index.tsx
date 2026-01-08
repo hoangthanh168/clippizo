@@ -114,7 +114,7 @@ export const Header = ({ dictionary }: HeaderProps) => {
           ) : (
             <nav className="flex flex-row gap-4">
               {navigationItems.map((item) => (
-                <Button key={item.title} asChild variant="ghost">
+                <Button asChild key={item.title} variant="ghost">
                   <Link href={item.href || "#"}>{item.title}</Link>
                 </Button>
               ))}

@@ -73,3 +73,10 @@ npm run dev --filter storybook # Component library (port 6006)
 import { captureException } from '@sentry/nextjs';
 import { log } from '@repo/observability';
 ```
+
+## Active Technologies
+- TypeScript 5.x, Node.js 20+ LTS + Next.js (App Router), Prisma ORM, PayPal SDK, Zod (003-credits-system)
+- PostgreSQL 15+ via Supabase (existing) (003-credits-system)
+
+## Recent Changes
+- 003-credits-system: Added TypeScript 5.x, Node.js 20+ LTS + Next.js (App Router), Prisma ORM, PayPal SDK, Zod

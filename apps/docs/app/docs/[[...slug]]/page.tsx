@@ -1,4 +1,7 @@
-import { source } from "@/lib/source";
+import { Callout } from "fumadocs-ui/components/callout";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import defaultMdxComponents from "fumadocs-ui/mdx";
 import {
   DocsBody,
   DocsDescription,
@@ -6,10 +9,7 @@ import {
   DocsTitle,
 } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
-import defaultMdxComponents from "fumadocs-ui/mdx";
-import { Tab, Tabs } from "fumadocs-ui/components/tabs";
-import { Callout } from "fumadocs-ui/components/callout";
-import { Step, Steps } from "fumadocs-ui/components/steps";
+import { source } from "@/lib/source";
 
 interface PageData {
   title: string;
@@ -30,7 +30,7 @@ export default async function Page(props: {
   const MDX = data.body;
 
   return (
-    <DocsPage toc={data.toc} full={data.full}>
+    <DocsPage full={data.full} toc={data.toc}>
       <DocsTitle>{data.title}</DocsTitle>
       <DocsDescription>{data.description}</DocsDescription>
       <DocsBody>

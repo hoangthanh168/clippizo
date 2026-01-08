@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-export const GET = () => {
-  return NextResponse.json({
+export const GET = () =>
+  NextResponse.json({
     name: "Clippizo API",
     version: "1.0.0",
     status: "running",
@@ -20,4 +20,3 @@ export const GET = () => {
       },
     },
   });
-};

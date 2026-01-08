@@ -40,6 +40,8 @@ import {
   BookOpenIcon,
   BotIcon,
   ChevronRightIcon,
+  CoinsIcon,
+  CreditCardIcon,
   FolderIcon,
   FrameIcon,
   LifeBuoyIcon,
@@ -154,6 +156,16 @@ const data = {
     },
   ],
   navSecondary: [
+    {
+      title: "Credits",
+      url: "/credits",
+      icon: CoinsIcon,
+    },
+    {
+      title: "Billing",
+      url: "/billing",
+      icon: CreditCardIcon,
+    },
     {
       title: "Webhooks",
       url: "/webhooks",

@@ -1,6 +1,6 @@
 import "server-only";
 import { database } from "@repo/database";
-import { type PlanId, PLANS, isPaidPlan } from "./plans";
+import { isPaidPlan, PLANS, type PlanId } from "./plans";
 
 export type SubscriptionStatus = "active" | "expired" | "cancelled" | null;
 
@@ -48,8 +48,7 @@ export async function getSubscriptionInfo(
   const actualStatus = isExpired ? "expired" : status;
 
   // Free plan is always active and can create
-  const isActive =
-    plan === "free" || (actualStatus === "active" && !isExpired);
+  const isActive = plan === "free" || (actualStatus === "active" && !isExpired);
   const canCreate = plan === "free" || isActive;
 
   // Calculate days remaining
@@ -77,10 +76,16 @@ export interface ActivateSubscriptionParams {
   isRenewal?: boolean;
 }
 
+export interface ActivateSubscriptionResult {
+  expiresAt: Date;
+  planId: PlanId;
+  isRenewal: boolean;
+}
+
 export async function activateSubscription(
   params: ActivateSubscriptionParams
-): Promise<void> {
-  const { profileId, planId, isRenewal } = params;
+): Promise<ActivateSubscriptionResult> {
+  const { profileId, planId, isRenewal = false } = params;
 
   if (!isPaidPlan(planId)) {
     throw new Error("Cannot activate free plan");
@@ -117,6 +122,12 @@ export async function activateSubscription(
       subscriptionExpiresAt: newExpiresAt,
     },
   });
+
+  return {
+    expiresAt: newExpiresAt,
+    planId,
+    isRenewal,
+  };
 }
 
 export async function cancelSubscription(profileId: string): Promise<void> {

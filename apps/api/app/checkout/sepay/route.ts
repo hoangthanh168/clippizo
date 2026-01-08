@@ -2,11 +2,7 @@ import { auth } from "@repo/auth/server";
 import { database } from "@repo/database";
 import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
-import {
-  createSePayCheckout,
-  isPaidPlan,
-  type PlanId,
-} from "@repo/payments";
+import { createSePayCheckout, isPaidPlan, type PlanId } from "@repo/payments";
 import { NextResponse } from "next/server";
 
 export const POST = async (request: Request): Promise<Response> => {
@@ -26,7 +22,7 @@ export const POST = async (request: Request): Promise<Response> => {
       isRenewal?: boolean;
     };
 
-    if (!plan || !isPaidPlan(plan)) {
+    if (!(plan && isPaidPlan(plan))) {
       return NextResponse.json(
         { message: "Invalid plan", ok: false },
         { status: 400 }

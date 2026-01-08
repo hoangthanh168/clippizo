@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function SePayCancelPage() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export default function SePayCancelPage() {
           <XCircle className="h-16 w-16 text-yellow-500" />
         </div>
 
-        <h1 className="mb-2 text-2xl font-bold">Payment Cancelled</h1>
+        <h1 className="mb-2 font-bold text-2xl">Payment Cancelled</h1>
 
         <p className="mb-6 text-muted-foreground">
           Your payment was cancelled. No charges were made to your account.
@@ -21,17 +21,17 @@ export default function SePayCancelPage() {
 
         <div className="flex flex-col gap-2">
           <button
-            type="button"
-            onClick={() => router.push("/pricing")}
             className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
+            onClick={() => router.push("/pricing")}
+            type="button"
           >
             Try again
           </button>
 
           <button
-            type="button"
+            className="text-muted-foreground text-sm underline"
             onClick={() => router.push("/")}
-            className="text-sm text-muted-foreground underline"
+            type="button"
           >
             Return home
           </button>

@@ -7,6 +7,8 @@ export interface SubscriptionPlan {
   priceUSD: number;
   durationDays: number;
   features: string[];
+  monthlyCredits: number;
+  rolloverCapMultiplier: number;
 }
 
 export const PLANS: Record<PlanId, SubscriptionPlan> = {
@@ -17,19 +19,23 @@ export const PLANS: Record<PlanId, SubscriptionPlan> = {
     priceUSD: 0,
     durationDays: 0,
     features: ["read-only"],
+    monthlyCredits: 50,
+    rolloverCapMultiplier: 1,
   },
   pro: {
     id: "pro",
     name: "Pro",
-    priceVND: 99000,
+    priceVND: 99_000,
     priceUSD: 9.99,
     durationDays: 30,
     features: ["full-access", "unlimited-videos", "rag-search"],
+    monthlyCredits: 500,
+    rolloverCapMultiplier: 2,
   },
   enterprise: {
     id: "enterprise",
     name: "Enterprise",
-    priceVND: 299000,
+    priceVND: 299_000,
     priceUSD: 29.99,
     durationDays: 30,
     features: [
@@ -39,6 +45,8 @@ export const PLANS: Record<PlanId, SubscriptionPlan> = {
       "priority-support",
       "api-access",
     ],
+    monthlyCredits: 2000,
+    rolloverCapMultiplier: 2,
   },
 } as const;
 
@@ -53,4 +61,13 @@ export function getPlanPrice(planId: PlanId, currency: "VND" | "USD"): number {
 
 export function isPaidPlan(planId: string): planId is "pro" | "enterprise" {
   return planId === "pro" || planId === "enterprise";
+}
+
+export function getPlanCredits(planId: PlanId): number {
+  return PLANS[planId].monthlyCredits;
+}
+
+export function getPlanRolloverCap(planId: PlanId): number {
+  const plan = PLANS[planId];
+  return plan.monthlyCredits * plan.rolloverCapMultiplier;
 }

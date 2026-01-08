@@ -1,10 +1,14 @@
 import { analytics } from "@repo/analytics/server";
+import {
+  allocateCreditsOnSubscriptionActivation,
+  finalizeCreditPackPurchase,
+} from "@repo/credits";
 import { database } from "@repo/database";
 import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
 import {
-  getPayPalOrder,
   activateSubscription,
+  getPayPalOrder,
   getPlan,
   type PlanId,
 } from "@repo/payments";
@@ -63,9 +67,11 @@ export const POST = async (request: Request): Promise<Response> => {
 
     // Parse custom data
     let customData: {
+      type?: "pack" | "subscription";
       profileId: string;
-      planId: PlanId;
-      isRenewal: boolean;
+      planId?: PlanId;
+      packId?: string;
+      isRenewal?: boolean;
     };
 
     try {
@@ -78,12 +84,36 @@ export const POST = async (request: Request): Promise<Response> => {
       );
     }
 
-    const { profileId, planId, isRenewal } = customData;
+    const { profileId } = customData;
 
-    if (!profileId || !planId) {
-      log.error("PayPal webhook: missing required data", { orderId });
+    if (!profileId) {
+      log.error("PayPal webhook: missing profileId", { orderId });
       return NextResponse.json(
         { message: "Missing required data", ok: false },
+        { status: 400 }
+      );
+    }
+
+    // Handle pack purchase
+    if (customData.type === "pack" && customData.packId) {
+      return handlePackPurchase({
+        profileId,
+        packId: customData.packId,
+        orderId,
+        transactionId: captureData?.id ?? "",
+        amount: Number.parseFloat(captureData?.amount?.value || "0"),
+        currency: captureData?.amount?.currencyCode || "USD",
+        webhookEventId: body.id,
+      });
+    }
+
+    // Handle subscription payment
+    const { planId, isRenewal } = customData;
+
+    if (!planId) {
+      log.error("PayPal webhook: missing planId for subscription", { orderId });
+      return NextResponse.json(
+        { message: "Missing plan data", ok: false },
         { status: 400 }
       );
     }
@@ -146,10 +176,23 @@ export const POST = async (request: Request): Promise<Response> => {
     });
 
     // Activate subscription
-    await activateSubscription({
+    const subscriptionResult = await activateSubscription({
       profileId,
       planId,
       isRenewal,
+    });
+
+    // Allocate monthly credits
+    const creditAllocation = await allocateCreditsOnSubscriptionActivation(
+      profileId,
+      planId,
+      subscriptionResult.expiresAt
+    );
+
+    log.info("Credits allocated", {
+      profileId,
+      creditsAllocated: creditAllocation.creditsAllocated,
+      totalBalance: creditAllocation.totalBalance,
     });
 
     // Track analytics
@@ -168,6 +211,7 @@ export const POST = async (request: Request): Promise<Response> => {
           amount,
           currency,
           source: "webhook",
+          creditsAllocated: creditAllocation.creditsAllocated,
         },
       });
     }
@@ -191,3 +235,97 @@ export const POST = async (request: Request): Promise<Response> => {
     );
   }
 };
+
+// Handle credit pack purchase
+async function handlePackPurchase(params: {
+  profileId: string;
+  packId: string;
+  orderId: string;
+  transactionId: string;
+  amount: number;
+  currency: string;
+  webhookEventId: string;
+}): Promise<Response> {
+  const {
+    profileId,
+    packId,
+    orderId,
+    transactionId,
+    amount,
+    currency,
+    webhookEventId,
+  } = params;
+
+  // Check for idempotency
+  const existingPayment = await database.payment.findUnique({
+    where: {
+      provider_providerTransactionId: {
+        provider: "paypal",
+        providerTransactionId: transactionId,
+      },
+    },
+  });
+
+  if (existingPayment) {
+    log.info("PayPal webhook: duplicate pack transaction", { transactionId });
+    return NextResponse.json({ message: "Already processed", ok: true });
+  }
+
+  // Create payment record
+  await database.payment.create({
+    data: {
+      profileId,
+      amount,
+      currency,
+      provider: "paypal",
+      providerTransactionId: transactionId,
+      providerOrderId: orderId,
+      status: "completed",
+      plan: `pack_${packId}`,
+      metadata: {
+        type: "pack",
+        packId,
+        webhookEventId,
+      },
+    },
+  });
+
+  // Finalize credit pack purchase
+  const packResult = await finalizeCreditPackPurchase(profileId, packId, {
+    provider: "paypal",
+    transactionId,
+    orderId,
+  });
+
+  // Track analytics
+  const profile = await database.profile.findUnique({
+    where: { id: profileId },
+    select: { clerkUserId: true },
+  });
+
+  if (profile) {
+    analytics.capture({
+      event: "Credit Pack Purchased",
+      distinctId: profile.clerkUserId,
+      properties: {
+        packId,
+        provider: "paypal",
+        amount,
+        currency,
+        creditsAdded: packResult.creditsAdded,
+        source: "webhook",
+      },
+    });
+  }
+
+  await analytics.shutdown();
+
+  log.info("PayPal pack webhook processed successfully", {
+    profileId,
+    packId,
+    creditsAdded: packResult.creditsAdded,
+    transactionId,
+  });
+
+  return NextResponse.json({ message: "Success", ok: true });
+}
