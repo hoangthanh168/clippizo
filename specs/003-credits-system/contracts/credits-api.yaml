@@ -1,0 +1,412 @@
+openapi: 3.0.3
+info:
+  title: Clippizo Credits API
+  description: API for managing user credits in Clippizo
+  version: 1.0.0
+
+servers:
+  - url: /api/credits
+    description: Credits API routes
+
+paths:
+  /balance:
+    get:
+      summary: Get current credit balance
+      description: Returns the user's total available credits with breakdown by source
+      operationId: getBalance
+      tags:
+        - Credits
+      security:
+        - clerkAuth: []
+      responses:
+        '200':
+          description: Credit balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditBalance'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /consume:
+    post:
+      summary: Consume credits for an operation
+      description: Deducts credits for AI tool usage (atomic operation)
+      operationId: consumeCredits
+      tags:
+        - Credits
+      security:
+        - clerkAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsumeRequest'
+      responses:
+        '200':
+          description: Credits consumed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsumeResponse'
+        '400':
+          $ref: '#/components/responses/InsufficientCredits'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /history:
+    get:
+      summary: Get credit transaction history
+      description: Returns paginated list of credit transactions
+      operationId: getHistory
+      tags:
+        - Credits
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [allocation, pack_purchase, consumption, expiration, adjustment]
+      responses:
+        '200':
+          description: Transaction history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionHistory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /packs:
+    get:
+      summary: List available credit packs
+      description: Returns all purchasable credit pack options
+      operationId: listPacks
+      tags:
+        - Credit Packs
+      responses:
+        '200':
+          description: Credit packs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditPackList'
+
+  /packs/purchase:
+    post:
+      summary: Purchase a credit pack
+      description: Initiates credit pack purchase flow
+      operationId: purchasePack
+      tags:
+        - Credit Packs
+      security:
+        - clerkAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchasePackRequest'
+      responses:
+        '200':
+          description: Purchase initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchasePackResponse'
+        '400':
+          description: Invalid request or no active subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    clerkAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Clerk authentication token
+
+  schemas:
+    CreditBalance:
+      type: object
+      required:
+        - total
+        - breakdown
+        - isLow
+      properties:
+        total:
+          type: integer
+          description: Total available credits
+          example: 450
+        breakdown:
+          type: object
+          properties:
+            monthly:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  example: 350
+                expiresAt:
+                  type: string
+                  format: date-time
+            pack:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  example: 100
+                expiresAt:
+                  type: string
+                  format: date-time
+        isLow:
+          type: boolean
+          description: True if balance is below 20% of monthly allocation
+          example: false
+        expiringCredits:
+          type: object
+          description: Credits expiring within 7 days
+          properties:
+            amount:
+              type: integer
+              example: 50
+            expiresAt:
+              type: string
+              format: date-time
+
+    ConsumeRequest:
+      type: object
+      required:
+        - operation
+      properties:
+        operation:
+          type: string
+          description: The operation consuming credits
+          enum:
+            - image-gen-basic
+            - image-gen-premium
+            - video-gen-short
+            - video-gen-long
+            - chatbot-message
+          example: image-gen-basic
+        metadata:
+          type: object
+          description: Additional context (e.g., generation ID)
+          additionalProperties: true
+
+    ConsumeResponse:
+      type: object
+      required:
+        - success
+        - creditsUsed
+        - remainingBalance
+        - transactionId
+      properties:
+        success:
+          type: boolean
+          example: true
+        creditsUsed:
+          type: integer
+          example: 10
+        remainingBalance:
+          type: integer
+          example: 440
+        transactionId:
+          type: string
+          example: "clu1234567890"
+        isLow:
+          type: boolean
+          description: Warning flag if balance is now low
+          example: false
+
+    TransactionHistory:
+      type: object
+      required:
+        - transactions
+        - total
+        - hasMore
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        total:
+          type: integer
+          description: Total number of transactions
+          example: 150
+        hasMore:
+          type: boolean
+          description: Whether more transactions exist
+          example: true
+
+    Transaction:
+      type: object
+      required:
+        - id
+        - type
+        - amount
+        - balanceAfter
+        - createdAt
+      properties:
+        id:
+          type: string
+          example: "clu1234567890"
+        type:
+          type: string
+          enum: [allocation, pack_purchase, consumption, expiration, adjustment]
+          example: consumption
+        amount:
+          type: integer
+          description: Positive for additions, negative for deductions
+          example: -10
+        balanceAfter:
+          type: integer
+          example: 440
+        operation:
+          type: string
+          description: The operation that consumed credits
+          example: image-gen-basic
+        description:
+          type: string
+          example: "Generated AI image"
+        createdAt:
+          type: string
+          format: date-time
+
+    CreditPackList:
+      type: object
+      required:
+        - packs
+      properties:
+        packs:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditPack'
+
+    CreditPack:
+      type: object
+      required:
+        - id
+        - name
+        - credits
+        - priceUSD
+        - priceVND
+        - validityDays
+      properties:
+        id:
+          type: string
+          example: medium
+        name:
+          type: string
+          example: "Medium Pack"
+        credits:
+          type: integer
+          example: 500
+        priceUSD:
+          type: number
+          format: float
+          example: 9.99
+        priceVND:
+          type: integer
+          example: 99000
+        validityDays:
+          type: integer
+          example: 90
+
+    PurchasePackRequest:
+      type: object
+      required:
+        - packId
+        - provider
+      properties:
+        packId:
+          type: string
+          enum: [small, medium, large]
+          example: medium
+        provider:
+          type: string
+          enum: [paypal, sepay]
+          example: paypal
+
+    PurchasePackResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: true
+        paymentUrl:
+          type: string
+          description: URL to redirect for PayPal payment
+          example: "https://www.paypal.com/checkoutnow?token=..."
+        orderId:
+          type: string
+          description: Order ID for tracking
+          example: "ord_1234567890"
+        qrCode:
+          type: string
+          description: QR code for SePay payment (base64)
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: "INSUFFICIENT_CREDITS"
+        message:
+          type: string
+          example: "Not enough credits for this operation"
+        required:
+          type: integer
+          description: Credits required for operation
+          example: 100
+        available:
+          type: integer
+          description: Currently available credits
+          example: 50
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "UNAUTHORIZED"
+            message: "Authentication required"
+
+    InsufficientCredits:
+      description: Not enough credits for operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "INSUFFICIENT_CREDITS"
+            message: "Not enough credits for this operation"
+            required: 100
+            available: 50

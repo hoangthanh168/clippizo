@@ -17,13 +17,13 @@ datasource db {
 // ============================================
 
 model Profile {
-  id            String    @id @default(cuid())
-  clerkUserId   String    @unique @map("clerk_user_id")
-  email         String
-  firstName     String?   @map("first_name")
-  lastName      String?   @map("last_name")
-  avatarUrl     String?   @map("avatar_url")
-  phoneNumber   String?   @map("phone_number")
+  id          String  @id @default(cuid())
+  clerkUserId String  @unique @map("clerk_user_id")
+  email       String
+  firstName   String? @map("first_name")
+  lastName    String? @map("last_name")
+  avatarUrl   String? @map("avatar_url")
+  phoneNumber String? @map("phone_number")
 
   // Subscription & Payments
   plan                  String    @default("free") // free, pro, enterprise
@@ -32,17 +32,19 @@ model Profile {
   billingEmail          String?   @map("billing_email")
 
   // Metadata
-  metadata   Json      @default("{}")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at")
+  metadata  Json      @default("{}")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   // Relations
-  channels          Channel[]
-  videos            Video[]
-  transcripts       Transcript[]
-  transcriptChunks  TranscriptChunk[]
-  payments          Payment[]
+  channels           Channel[]
+  videos             Video[]
+  transcripts        Transcript[]
+  transcriptChunks   TranscriptChunk[]
+  payments           Payment[]
+  creditSources      CreditSource[]
+  creditTransactions CreditTransaction[]
 
   @@index([clerkUserId])
   @@index([email])
@@ -54,21 +56,21 @@ model Profile {
 // ============================================
 
 model Payment {
-  id                    String   @id @default(cuid())
-  profileId             String   @map("profile_id")
-  profile               Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  profileId String  @map("profile_id")
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   amount                Decimal
-  currency              String   // VND or USD
-  provider              String   // sepay or paypal
-  providerTransactionId String   @map("provider_transaction_id")
-  providerOrderId       String?  @map("provider_order_id")
-  status                String   @default("pending") // pending, completed, failed, refunded
-  plan                  String   // pro or enterprise
-  metadata              Json     @default("{}")
+  currency              String // VND or USD
+  provider              String // sepay or paypal
+  providerTransactionId String  @map("provider_transaction_id")
+  providerOrderId       String? @map("provider_order_id")
+  status                String  @default("pending") // pending, completed, failed, refunded
+  plan                  String // pro or enterprise
+  metadata              Json    @default("{}")
 
-  createdAt             DateTime @default(now()) @map("created_at")
-  updatedAt             DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([provider, providerTransactionId])
   @@index([profileId])
@@ -77,12 +79,64 @@ model Payment {
 }
 
 // ============================================
+// Credits System
+// ============================================
+
+model CreditSource {
+  id        String  @id @default(cuid())
+  profileId String  @map("profile_id")
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  type          String // 'monthly' or 'pack'
+  amount        Int // Current remaining credits in this source
+  initialAmount Int      @map("initial_amount") // Original allocation
+  expiresAt     DateTime @map("expires_at")
+
+  // For pack purchases only
+  packId String? @map("pack_id")
+
+  // For monthly allocations only
+  billingCycleStart DateTime? @map("billing_cycle_start")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([profileId])
+  @@index([profileId, type])
+  @@index([expiresAt])
+  @@map("credit_sources")
+}
+
+model CreditTransaction {
+  id        String  @id @default(cuid())
+  profileId String  @map("profile_id")
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  type         String // 'allocation' | 'pack_purchase' | 'consumption' | 'expiration' | 'adjustment'
+  amount       Int // Positive for additions, negative for deductions
+  balanceAfter Int    @map("balance_after") // Total balance after this transaction
+
+  // Context
+  operation   String? // e.g., 'image-gen-basic', 'video-gen-short'
+  sourceId    String? @map("source_id") // Reference to CreditSource
+  description String? // Human-readable description
+  metadata    Json    @default("{}")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([profileId])
+  @@index([profileId, createdAt])
+  @@index([type])
+  @@map("credit_transactions")
+}
+
+// ============================================
 // Boilerplate Demo
 // ============================================
 
 model Page {
-  id        String   @id @default(cuid())
-  name      String
+  id   String @id @default(cuid())
+  name String
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -95,24 +149,24 @@ model Page {
 // ============================================
 
 model Channel {
-  id              String    @id @default(cuid())
-  profileId       String    @map("profile_id")
-  profile         Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  profileId String  @map("profile_id")
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
-  channelId       String    @unique @map("channel_id") // YouTube channel ID
-  channelName     String    @map("channel_name")
-  channelUrl      String?   @map("channel_url")
+  channelId       String  @unique @map("channel_id") // YouTube channel ID
+  channelName     String  @map("channel_name")
+  channelUrl      String? @map("channel_url")
   description     String?
-  subscriberCount Int?      @map("subscriber_count")
-  videoCount      Int?      @map("video_count")
-  thumbnailUrl    String?   @map("thumbnail_url")
+  subscriberCount Int?    @map("subscriber_count")
+  videoCount      Int?    @map("video_count")
+  thumbnailUrl    String? @map("thumbnail_url")
 
-  metadata   Json      @default("{}")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  videos     Video[]
+  videos Video[]
 
   @@index([profileId])
   @@index([channelId])
@@ -120,30 +174,30 @@ model Channel {
 }
 
 model Video {
-  id           String    @id @default(cuid())
-  profileId    String    @map("profile_id")
-  profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  channelId    String?   @map("channel_id")
-  channel      Channel?  @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  id        String   @id @default(cuid())
+  profileId String   @map("profile_id")
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  channelId String?  @map("channel_id")
+  channel   Channel? @relation(fields: [channelId], references: [id], onDelete: SetNull)
 
-  videoId      String    @unique @map("video_id") // YouTube video ID
-  title        String
-  description  String?
-  videoUrl     String?   @map("video_url")
-  thumbnailUrl String?   @map("thumbnail_url")
-  duration     Int?      // seconds
-  viewCount    Int?      @map("view_count")
-  likeCount    Int?      @map("like_count")
-  commentCount Int?      @map("comment_count")
-  publishedAt  DateTime? @map("published_at")
-  tags         String[]  @default([])
-  category     String?
-  language     String    @default("vi")
-  hasTranscript Boolean  @default(false) @map("has_transcript")
+  videoId       String    @unique @map("video_id") // YouTube video ID
+  title         String
+  description   String?
+  videoUrl      String?   @map("video_url")
+  thumbnailUrl  String?   @map("thumbnail_url")
+  duration      Int? // seconds
+  viewCount     Int?      @map("view_count")
+  likeCount     Int?      @map("like_count")
+  commentCount  Int?      @map("comment_count")
+  publishedAt   DateTime? @map("published_at")
+  tags          String[]  @default([])
+  category      String?
+  language      String    @default("vi")
+  hasTranscript Boolean   @default(false) @map("has_transcript")
 
-  metadata   Json      @default("{}")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
   transcript       Transcript?
@@ -156,11 +210,11 @@ model Video {
 }
 
 model Transcript {
-  id          String    @id @default(cuid())
-  profileId   String    @map("profile_id")
-  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  videoId     String    @unique @map("video_id")
-  video       Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  profileId String  @map("profile_id")
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  videoId   String  @unique @map("video_id")
+  video     Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
   fullText        String    @map("full_text")
   wordCount       Int?      @map("word_count")
@@ -168,15 +222,15 @@ model Transcript {
   source          String    @default("youtube") // youtube, manual, whisper
   isAutoGenerated Boolean   @default(true) @map("is_auto_generated")
   confidenceScore Float?    @map("confidence_score")
-  timestamps      Json?     // [{start, end, text}]
+  timestamps      Json? // [{start, end, text}]
   processedAt     DateTime? @map("processed_at")
 
-  metadata   Json      @default("{}")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  chunks     TranscriptChunk[]
+  chunks TranscriptChunk[]
 
   @@index([profileId])
   @@index([videoId])
@@ -184,26 +238,26 @@ model Transcript {
 }
 
 model TranscriptChunk {
-  id            String    @id @default(cuid())
-  profileId     String    @map("profile_id")
-  profile       Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  transcriptId  String?   @map("transcript_id")
-  transcript    Transcript? @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
-  videoId       String?   @map("video_id")
-  video         Video?    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  id           String      @id @default(cuid())
+  profileId    String      @map("profile_id")
+  profile      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  transcriptId String?     @map("transcript_id")
+  transcript   Transcript? @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  videoId      String?     @map("video_id")
+  video        Video?      @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
-  chunkIndex    Int       @map("chunk_index")
-  content       String
-  tokenCount    Int?      @map("token_count")
-  startTime     Float?    @map("start_time") // seconds
-  endTime       Float?    @map("end_time")   // seconds
+  chunkIndex Int    @map("chunk_index")
+  content    String
+  tokenCount Int?   @map("token_count")
+  startTime  Float? @map("start_time") // seconds
+  endTime    Float? @map("end_time") // seconds
 
   // Vector embedding - will be managed via raw SQL
   // Prisma doesn't fully support pgvector yet
-  embedding     Unsupported("vector(1536)")?
+  embedding Unsupported("vector(1536)")?
 
-  metadata   Json      @default("{}")
-  createdAt  DateTime  @default(now()) @map("created_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([profileId])
   @@index([transcriptId])
