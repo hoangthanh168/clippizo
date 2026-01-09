@@ -114,7 +114,9 @@ export const POST = async (request: Request): Promise<Response> => {
         providerTransactionId: transaction.transaction_id,
         providerOrderId: order.id,
         status: "completed",
+        paymentType: "subscription",
         plan: planId,
+        packId: null,
         metadata: {
           paymentMethod: transaction.payment_method,
           invoiceNumber: order.order_invoice_number,
@@ -159,6 +161,7 @@ export const POST = async (request: Request): Promise<Response> => {
           amount: order.order_amount,
           currency: "VND",
           creditsAllocated: creditAllocation.creditsAllocated,
+          source: "webhook",
         },
       });
     }
@@ -228,10 +231,10 @@ async function handlePackPurchase(params: {
       providerTransactionId: transactionId,
       providerOrderId: orderId,
       status: "completed",
-      plan: `pack_${packId}`,
+      paymentType: "credit_pack",
+      plan: null,
+      packId,
       metadata: {
-        type: "pack",
-        packId,
         invoiceNumber,
         paymentMethod,
       },

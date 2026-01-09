@@ -1,26 +1,27 @@
 import "server-only";
-import crypto from "node:crypto";
+import { SePayPgClient } from "sepay-pg-node";
 import { keys } from "./keys";
 import { getPlanPrice, type PlanId } from "./plans";
 
-const SEPAY_SANDBOX_URL = "https://pay-sandbox.sepay.vn";
-const SEPAY_PRODUCTION_URL = "https://pay.sepay.vn";
-
-function getBaseUrl(): string {
+function getClient(): SePayPgClient {
   const env = keys();
-  return env.SEPAY_MODE === "production"
-    ? SEPAY_PRODUCTION_URL
-    : SEPAY_SANDBOX_URL;
-}
 
-function generateSignature(data: string, secretKey: string): string {
-  return crypto.createHmac("sha256", secretKey).update(data).digest("hex");
+  if (!(env.SEPAY_MERCHANT_ID && env.SEPAY_SECRET_KEY)) {
+    throw new Error("SePay credentials not configured");
+  }
+
+  return new SePayPgClient({
+    env: env.SEPAY_MODE === "production" ? "production" : "sandbox",
+    merchant_id: env.SEPAY_MERCHANT_ID,
+    secret_key: env.SEPAY_SECRET_KEY,
+  });
 }
 
 export interface CreateCheckoutParams {
   planId: PlanId;
   profileId: string;
   isRenewal?: boolean;
+  invoiceNumber?: string;
   successUrl: string;
   errorUrl: string;
   cancelUrl: string;
@@ -29,63 +30,64 @@ export interface CreateCheckoutParams {
 export interface CreateCheckoutResult {
   checkoutUrl: string;
   invoiceNumber: string;
+  formFields: Record<string, string>;
 }
 
 export async function createSePayCheckout(
   params: CreateCheckoutParams
 ): Promise<CreateCheckoutResult> {
-  const { planId, profileId, isRenewal, successUrl, errorUrl, cancelUrl } =
-    params;
-  const env = keys();
+  const {
+    planId,
+    profileId,
+    isRenewal,
+    invoiceNumber: providedInvoiceNumber,
+    successUrl,
+    errorUrl,
+    cancelUrl,
+  } = params;
 
-  if (!(env.SEPAY_MERCHANT_ID && env.SEPAY_SECRET_KEY)) {
-    throw new Error("SePay credentials not configured");
-  }
-
+  const client = getClient();
   const amount = getPlanPrice(planId, "VND");
-  const invoiceNumber = `CLZ-${Date.now()}-${profileId.slice(-6)}`;
+  const invoiceNumber =
+    providedInvoiceNumber ?? `CLZ-${Date.now()}-${profileId.slice(-6)}`;
 
-  const formData: Record<string, string> = {
-    merchant: env.SEPAY_MERCHANT_ID,
-    currency: "VND",
-    order_amount: amount.toString(),
-    operation: "payment",
+  const formFields = client.checkout.initOneTimePaymentFields({
     order_invoice_number: invoiceNumber,
+    order_amount: amount,
+    currency: "VND",
     order_description: `Clippizo ${planId} subscription${isRenewal ? " (renewal)" : ""}`,
     success_url: successUrl,
     error_url: errorUrl,
     cancel_url: cancelUrl,
     custom_data: JSON.stringify({ profileId, planId, isRenewal }),
-  };
+  });
 
-  // Create signature from sorted params
-  const sortedKeys = Object.keys(formData).sort();
-  const signatureData = sortedKeys.map((key) => formData[key]).join("");
-  const signature = generateSignature(signatureData, env.SEPAY_SECRET_KEY);
-  formData.signature = signature;
+  // Build checkout URL
+  const checkoutUrl = client.checkout.initCheckoutUrl();
 
-  // Build checkout URL with form submission
-  const baseUrl = getBaseUrl();
-  const checkoutUrl = `${baseUrl}/v1/checkout/init`;
-
-  // For SePay, we need to POST the form data
-  // Return URL for redirect-based checkout
-  const urlParams = new URLSearchParams(formData);
+  // Convert formFields to Record<string, string> for form submission
+  const formFieldsRecord: Record<string, string> = {};
+  for (const [key, value] of Object.entries(formFields)) {
+    if (value !== undefined && value !== null) {
+      formFieldsRecord[key] = String(value);
+    }
+  }
 
   return {
-    checkoutUrl: `${checkoutUrl}?${urlParams.toString()}`,
+    checkoutUrl,
     invoiceNumber,
+    formFields: formFieldsRecord,
   };
 }
 
 export interface SePayIPNPayload {
-  notification_type: "ORDER_PAID" | "TRANSACTION_VOID";
+  notification_type: "ORDER_PAID" | "RENEWAL_ORDER_PAID" | "TRANSACTION_VOID";
   order: {
     id: string;
     order_status: string;
     order_amount: number;
     order_invoice_number: string;
-    custom_data?: string;
+    custom_data?: string | Record<string, unknown>;
   };
   transaction: {
     transaction_id: string;
@@ -107,12 +109,12 @@ export function verifySePayIPN(
 ): VerifyIPNResult {
   const env = keys();
 
-  if (!env.SEPAY_SECRET_KEY) {
-    return { isValid: false, error: "SePay secret key not configured" };
+  if (!env.SEPAY_IPN_SECRET) {
+    return { isValid: false, error: "SePay IPN secret not configured" };
   }
 
-  // Verify secret key matches
-  if (secretKey !== env.SEPAY_SECRET_KEY) {
+  // Verify secret key matches (IPN secret is different from API secret)
+  if (secretKey !== env.SEPAY_IPN_SECRET) {
     return { isValid: false, error: "Invalid secret key" };
   }
 
@@ -133,10 +135,20 @@ export interface ParsedCustomData {
 }
 
 export function parseSePayCustomData(
-  customData?: string
+  customData?: string | Record<string, unknown>
 ): ParsedCustomData | null {
   if (!customData) return null;
 
+  // SePay returns custom_data as parsed object, not string
+  if (typeof customData === "object") {
+    return {
+      profileId: String(customData.profileId ?? ""),
+      planId: (customData.planId as PlanId) ?? "pro",
+      isRenewal: Boolean(customData.isRenewal),
+    };
+  }
+
+  // Fallback: parse as JSON string
   try {
     const parsed = JSON.parse(customData);
     return {
@@ -159,6 +171,7 @@ export interface CreatePackCheckoutParams {
   priceVND: number;
   credits: number;
   profileId: string;
+  invoiceNumber?: string;
   successUrl: string;
   errorUrl: string;
   cancelUrl: string;
@@ -167,6 +180,7 @@ export interface CreatePackCheckoutParams {
 export interface CreatePackCheckoutResult {
   checkoutUrl: string;
   invoiceNumber: string;
+  formFields: Record<string, string>;
 }
 
 export async function createSePayPackCheckout(
@@ -178,45 +192,42 @@ export async function createSePayPackCheckout(
     priceVND,
     credits,
     profileId,
+    invoiceNumber: providedInvoiceNumber,
     successUrl,
     errorUrl,
     cancelUrl,
   } = params;
-  const env = keys();
 
-  if (!(env.SEPAY_MERCHANT_ID && env.SEPAY_SECRET_KEY)) {
-    throw new Error("SePay credentials not configured");
-  }
+  const client = getClient();
+  const invoiceNumber =
+    providedInvoiceNumber ?? `CLZ-PACK-${Date.now()}-${profileId.slice(-6)}`;
 
-  const invoiceNumber = `CLZ-PACK-${Date.now()}-${profileId.slice(-6)}`;
-
-  const formData: Record<string, string> = {
-    merchant: env.SEPAY_MERCHANT_ID,
-    currency: "VND",
-    order_amount: priceVND.toString(),
-    operation: "payment",
+  const formFields = client.checkout.initOneTimePaymentFields({
     order_invoice_number: invoiceNumber,
+    order_amount: priceVND,
+    currency: "VND",
     order_description: `Clippizo ${packName} (${credits} credits)`,
     success_url: successUrl,
     error_url: errorUrl,
     cancel_url: cancelUrl,
     custom_data: JSON.stringify({ type: "pack", profileId, packId }),
-  };
+  });
 
-  // Create signature from sorted params
-  const sortedKeys = Object.keys(formData).sort();
-  const signatureData = sortedKeys.map((key) => formData[key]).join("");
-  const signature = generateSignature(signatureData, env.SEPAY_SECRET_KEY);
-  formData.signature = signature;
+  // Build checkout URL
+  const checkoutUrl = client.checkout.initCheckoutUrl();
 
-  // Build checkout URL with form submission
-  const baseUrl = getBaseUrl();
-  const checkoutUrl = `${baseUrl}/v1/checkout/init`;
-  const urlParams = new URLSearchParams(formData);
+  // Convert formFields to Record<string, string> for form submission
+  const formFieldsRecord: Record<string, string> = {};
+  for (const [key, value] of Object.entries(formFields)) {
+    if (value !== undefined && value !== null) {
+      formFieldsRecord[key] = String(value);
+    }
+  }
 
   return {
-    checkoutUrl: `${checkoutUrl}?${urlParams.toString()}`,
+    checkoutUrl,
     invoiceNumber,
+    formFields: formFieldsRecord,
   };
 }
 
@@ -227,10 +238,21 @@ export interface ParsedPackCustomData {
 }
 
 export function parseSePayPackCustomData(
-  customData?: string
+  customData?: string | Record<string, unknown>
 ): ParsedPackCustomData | null {
   if (!customData) return null;
 
+  // SePay returns custom_data as parsed object, not string
+  if (typeof customData === "object") {
+    if (customData.type !== "pack") return null;
+    return {
+      type: "pack",
+      profileId: String(customData.profileId ?? ""),
+      packId: String(customData.packId ?? ""),
+    };
+  }
+
+  // Fallback: parse as JSON string
   try {
     const parsed = JSON.parse(customData);
     if (parsed.type !== "pack") return null;

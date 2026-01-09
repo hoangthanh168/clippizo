@@ -1,12 +1,18 @@
 "use client";
 
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@repo/design-system/components/ui/alert";
+import { Button } from "@repo/design-system/components/ui/button";
 import { Clock, X } from "lucide-react";
 import { useState } from "react";
 
 type ExpiringCreditsWarningProps = {
-  amount: number;
-  expiresAt: Date | string;
-  dismissible?: boolean;
+  readonly amount: number;
+  readonly expiresAt: Date | string;
+  readonly dismissible?: boolean;
 };
 
 export function ExpiringCreditsWarning({
@@ -35,36 +41,33 @@ export function ExpiringCreditsWarning({
     });
 
   return (
-    <div className="relative rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-900 dark:bg-orange-950">
-      <div className="flex items-start gap-3">
-        <Clock className="mt-0.5 h-5 w-5 shrink-0 text-orange-600 dark:text-orange-500" />
-        <div className="flex-grow">
-          <h4 className="font-medium text-orange-800 dark:text-orange-200">
-            Credits Expiring Soon
-          </h4>
-          <p className="mt-1 text-orange-700 text-sm dark:text-orange-300">
-            <span className="font-semibold">{amount}</span> credits will expire{" "}
-            {daysUntilExpiry <= 1 ? (
-              <span className="font-semibold">tomorrow</span>
-            ) : (
-              <>
-                in <span className="font-semibold">{daysUntilExpiry} days</span>
-              </>
-            )}{" "}
-            on {formatDate(expireDate)}. Use them before they expire!
-          </p>
-        </div>
-        {dismissible === true ? (
-          <button
-            aria-label="Dismiss"
-            className="text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-200"
+    <Alert className="border-orange-200 bg-orange-50 text-orange-800 dark:border-orange-900 dark:bg-orange-950 dark:text-orange-200">
+      <Clock className="text-orange-600 dark:text-orange-500" />
+      <AlertTitle className="flex items-center justify-between">
+        <span>Credits Expiring Soon</span>
+        {dismissible && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-6 w-6 text-orange-600 hover:bg-orange-100 hover:text-orange-800 dark:text-orange-400 dark:hover:bg-orange-900 dark:hover:text-orange-200"
             onClick={() => setDismissed(true)}
-            type="button"
+            aria-label="Dismiss"
           >
             <X className="h-4 w-4" />
-          </button>
-        ) : null}
-      </div>
-    </div>
+          </Button>
+        )}
+      </AlertTitle>
+      <AlertDescription className="text-orange-700 dark:text-orange-300">
+        <span className="font-semibold">{amount}</span> credits will expire{" "}
+        {daysUntilExpiry <= 1 ? (
+          <span className="font-semibold">tomorrow</span>
+        ) : (
+          <>
+            in <span className="font-semibold">{daysUntilExpiry} days</span>
+          </>
+        )}{" "}
+        on {formatDate(expireDate)}. Use them before they expire!
+      </AlertDescription>
+    </Alert>
   );
 }

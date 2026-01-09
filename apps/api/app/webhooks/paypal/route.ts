@@ -8,9 +8,12 @@ import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
 import {
   activateSubscription,
+  extractPayPalWebhookHeaders,
   getPayPalOrder,
   getPlan,
+  keys,
   type PlanId,
+  verifyPayPalWebhook,
 } from "@repo/payments";
 import { NextResponse } from "next/server";
 
@@ -43,6 +46,39 @@ export const POST = async (request: Request): Promise<Response> => {
       eventId: body.id,
       eventType: body.event_type,
     });
+
+    // Verify webhook signature
+    const webhookHeaders = extractPayPalWebhookHeaders(request.headers);
+    const env = keys();
+
+    if (
+      webhookHeaders.transmissionId &&
+      webhookHeaders.transmissionTime &&
+      webhookHeaders.certUrl &&
+      webhookHeaders.authAlgo &&
+      webhookHeaders.transmissionSig &&
+      env.PAYPAL_WEBHOOK_ID
+    ) {
+      const verification = await verifyPayPalWebhook({
+        transmissionId: webhookHeaders.transmissionId,
+        transmissionTime: webhookHeaders.transmissionTime,
+        certUrl: webhookHeaders.certUrl,
+        authAlgo: webhookHeaders.authAlgo,
+        transmissionSig: webhookHeaders.transmissionSig,
+        webhookId: env.PAYPAL_WEBHOOK_ID,
+        webhookEvent: body,
+      });
+
+      if (!verification.isValid) {
+        log.warn("PayPal webhook: invalid signature", {
+          error: verification.error,
+        });
+        return NextResponse.json(
+          { message: "Invalid signature", ok: false },
+          { status: 401 }
+        );
+      }
+    }
 
     // Only process completed capture events
     if (body.event_type !== "PAYMENT.CAPTURE.COMPLETED") {
@@ -102,7 +138,7 @@ export const POST = async (request: Request): Promise<Response> => {
         orderId,
         transactionId: captureData?.id ?? "",
         amount: Number.parseFloat(captureData?.amount?.value || "0"),
-        currency: captureData?.amount?.currencyCode || "USD",
+        currencyCode: captureData?.amount?.currencyCode || "USD",
         webhookEventId: body.id,
       });
     }
@@ -155,10 +191,11 @@ export const POST = async (request: Request): Promise<Response> => {
     }
 
     const amount = Number.parseFloat(captureData.amount?.value || "0");
-    const currency = captureData.amount?.currencyCode || "USD";
+    const currencyCode = captureData.amount?.currencyCode || "USD";
+    const currency = currencyCode === "VND" ? "VND" : "USD";
 
     // Create payment record
-    await database.payment.create({
+    const payment = await database.payment.create({
       data: {
         profileId,
         amount,
@@ -167,11 +204,26 @@ export const POST = async (request: Request): Promise<Response> => {
         providerTransactionId: transactionId,
         providerOrderId: orderId,
         status: "completed",
+        paymentType: "subscription",
         plan: planId,
+        packId: null,
         metadata: {
           isRenewal,
           webhookEventId: body.id,
         },
+      },
+    });
+
+    // Update checkout session status
+    await database.checkoutSession.updateMany({
+      where: {
+        providerOrderId: orderId,
+        status: { in: ["pending", "processing"] },
+      },
+      data: {
+        status: "completed",
+        completedAt: new Date(),
+        paymentId: payment.id,
       },
     });
 
@@ -243,7 +295,7 @@ async function handlePackPurchase(params: {
   orderId: string;
   transactionId: string;
   amount: number;
-  currency: string;
+  currencyCode: string;
   webhookEventId: string;
 }): Promise<Response> {
   const {
@@ -252,9 +304,12 @@ async function handlePackPurchase(params: {
     orderId,
     transactionId,
     amount,
-    currency,
+    currencyCode,
     webhookEventId,
   } = params;
+
+  // Convert currency code to enum
+  const currency = currencyCode === "VND" ? "VND" : "USD";
 
   // Check for idempotency
   const existingPayment = await database.payment.findUnique({
@@ -281,10 +336,10 @@ async function handlePackPurchase(params: {
       providerTransactionId: transactionId,
       providerOrderId: orderId,
       status: "completed",
-      plan: `pack_${packId}`,
+      paymentType: "credit_pack",
+      plan: null,
+      packId,
       metadata: {
-        type: "pack",
-        packId,
         webhookEventId,
       },
     },

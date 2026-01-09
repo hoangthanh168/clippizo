@@ -1,6 +1,16 @@
 "use client";
 
-import { CheckCircle, Loader2 } from "lucide-react";
+import { Button } from "@repo/design-system/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@repo/design-system/components/ui/card";
+import { Spinner } from "@repo/design-system/components/ui/spinner";
+import { CheckCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -12,55 +22,54 @@ function SePaySuccessContent() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          router.push("/billing");
-          return 0;
-        }
-        return prev - 1;
-      });
+      setCountdown((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [router]);
+  }, []);
+
+  useEffect(() => {
+    if (countdown === 0) {
+      router.push("/billing");
+    }
+  }, [countdown, router]);
 
   return (
-    <div className="mx-auto max-w-md text-center">
-      <div className="mb-6 flex justify-center">
-        <CheckCircle className="h-16 w-16 text-green-500" />
-      </div>
+    <Card className="mx-auto max-w-md">
+      <CardHeader className="text-center">
+        <div className="mb-4 flex justify-center">
+          <CheckCircle className="h-16 w-16 text-green-500" />
+        </div>
+        <CardTitle className="text-2xl">Payment Successful!</CardTitle>
+        <CardDescription>
+          Thank you for your purchase. Your subscription has been activated.
+        </CardDescription>
+      </CardHeader>
 
-      <h1 className="mb-2 font-bold text-2xl">Payment Successful!</h1>
+      <CardContent className="space-y-4 text-center">
+        {invoice && (
+          <p className="text-muted-foreground text-sm">Invoice: {invoice}</p>
+        )}
 
-      <p className="mb-4 text-muted-foreground">
-        Thank you for your purchase. Your subscription has been activated.
-      </p>
+        <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
+          <Spinner className="h-4 w-4" />
+          <span>Redirecting to billing in {countdown}s...</span>
+        </div>
+      </CardContent>
 
-      {invoice && (
-        <p className="mb-6 text-muted-foreground text-sm">Invoice: {invoice}</p>
-      )}
-
-      <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        <span>Redirecting to billing in {countdown}s...</span>
-      </div>
-
-      <button
-        className="mt-4 text-primary text-sm underline"
-        onClick={() => router.push("/billing")}
-        type="button"
-      >
-        Go to billing now
-      </button>
-    </div>
+      <CardFooter className="justify-center">
+        <Button variant="link" onClick={() => router.push("/billing")}>
+          Go to billing now
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
 
 export default function SePaySuccessPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin" />}>
+      <Suspense fallback={<Spinner />}>
         <SePaySuccessContent />
       </Suspense>
     </div>

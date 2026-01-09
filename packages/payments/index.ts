@@ -16,6 +16,11 @@ export {
   createPayPalOrder,
   createPayPalPackOrder,
   getPayPalOrder,
+  // Webhook verification
+  extractPayPalWebhookHeaders,
+  verifyPayPalWebhook,
+  type WebhookVerificationParams,
+  type WebhookVerificationResult,
 } from "./paypal";
 // Plans configuration
 export {

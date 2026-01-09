@@ -109,13 +109,16 @@ export const POST = async (request: Request): Promise<Response> => {
     }
 
     if (provider === "sepay") {
+      const invoiceNumber = `CLZ-PACK-${Date.now()}-${profile.id.slice(-6)}`;
+
       const result = await createSePayPackCheckout({
         packId: pack.id,
         packName: pack.name,
         priceVND: pack.priceVND,
         credits: pack.credits,
         profileId: profile.id,
-        successUrl: `${baseUrl}/credits/purchase/success?provider=sepay`,
+        invoiceNumber,
+        successUrl: `${baseUrl}/credits/purchase/success?provider=sepay&invoice=${invoiceNumber}`,
         errorUrl: `${baseUrl}/credits/purchase/error`,
         cancelUrl: `${baseUrl}/credits/purchase/cancel`,
       });
@@ -128,7 +131,8 @@ export const POST = async (request: Request): Promise<Response> => {
 
       return NextResponse.json({
         success: true,
-        paymentUrl: result.checkoutUrl,
+        checkoutUrl: result.checkoutUrl,
+        formFields: result.formFields,
         invoiceNumber: result.invoiceNumber,
       });
     }

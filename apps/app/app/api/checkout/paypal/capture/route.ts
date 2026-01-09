@@ -84,16 +84,19 @@ export const POST = async (request: Request): Promise<Response> => {
     }
 
     // Create payment record
+    const currency = captureResult.currency === "VND" ? "VND" : "USD";
     await database.payment.create({
       data: {
         profileId,
         amount: captureResult.amount,
-        currency: captureResult.currency,
+        currency,
         provider: "paypal",
         providerTransactionId: captureResult.transactionId,
         providerOrderId: captureResult.orderId,
         status: "completed",
+        paymentType: "subscription",
         plan: planId,
+        packId: null,
         metadata: {
           isRenewal,
         },

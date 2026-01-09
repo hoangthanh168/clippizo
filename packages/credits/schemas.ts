@@ -26,7 +26,7 @@ export const transactionTypeSchema = z.enum([
 
 export const consumeCreditsSchema = z.object({
   operation: creditOperationSchema,
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const purchasePackSchema = z.object({

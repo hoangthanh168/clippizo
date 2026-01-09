@@ -6,7 +6,7 @@ import type {
   UserJSON,
   WebhookEvent,
 } from "@repo/auth/server";
-import { database } from "@repo/database";
+import { database, Prisma } from "@repo/database";
 import { log } from "@repo/observability/log";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -15,38 +15,57 @@ import { env } from "@/env";
 
 // Sync profile to database using Prisma upsert
 const syncProfileToDatabase = async (data: UserJSON) => {
-  const email = data.email_addresses.at(0)?.email_address ?? "";
+  // Use primary email address instead of first email (Clerk best practice)
+  const primaryEmail =
+    data.email_addresses.find((e) => e.id === data.primary_email_address_id)
+      ?.email_address ?? "";
   const phoneNumber = data.phone_numbers.at(0)?.phone_number ?? null;
 
-  await database.profile.upsert({
-    where: { clerkUserId: data.id },
-    create: {
-      clerkUserId: data.id,
-      email,
-      firstName: data.first_name,
-      lastName: data.last_name,
-      avatarUrl: data.image_url,
-      phoneNumber,
-    },
-    update: {
-      email,
-      firstName: data.first_name,
-      lastName: data.last_name,
-      avatarUrl: data.image_url,
-      phoneNumber,
-    },
-  });
+  try {
+    await database.profile.upsert({
+      where: { clerkUserId: data.id },
+      create: {
+        clerkUserId: data.id,
+        email: primaryEmail,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        avatarUrl: data.image_url,
+        phoneNumber,
+      },
+      update: {
+        email: primaryEmail,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        avatarUrl: data.image_url,
+        phoneNumber,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      log.error("Database error syncing profile", {
+        code: error.code,
+        clerkUserId: data.id,
+        message: error.message,
+      });
+    }
+    throw error; // Re-throw to mark webhook as failed (Clerk will retry)
+  }
 };
 
 const handleUserCreated = async (data: UserJSON) => {
   // Sync to local database
   await syncProfileToDatabase(data);
 
+  // Use primary email for analytics
+  const primaryEmail = data.email_addresses.find(
+    (e) => e.id === data.primary_email_address_id
+  )?.email_address;
+
   // Track in analytics
   analytics.identify({
     distinctId: data.id,
     properties: {
-      email: data.email_addresses.at(0)?.email_address,
+      email: primaryEmail,
       firstName: data.first_name,
       lastName: data.last_name,
       createdAt: new Date(data.created_at),
@@ -67,11 +86,16 @@ const handleUserUpdated = async (data: UserJSON) => {
   // Sync to local database
   await syncProfileToDatabase(data);
 
+  // Use primary email for analytics
+  const primaryEmail = data.email_addresses.find(
+    (e) => e.id === data.primary_email_address_id
+  )?.email_address;
+
   // Track in analytics
   analytics.identify({
     distinctId: data.id,
     properties: {
-      email: data.email_addresses.at(0)?.email_address,
+      email: primaryEmail,
       firstName: data.first_name,
       lastName: data.last_name,
       createdAt: new Date(data.created_at),

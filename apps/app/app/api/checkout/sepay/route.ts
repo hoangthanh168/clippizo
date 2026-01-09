@@ -42,11 +42,15 @@ export const POST = async (request: Request): Promise<Response> => {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+    // Generate invoice number first so we can include it in success URL
+    const invoiceNumber = `CLZ-${Date.now()}-${profile.id.slice(-6)}`;
+
     const result = await createSePayCheckout({
       planId: plan as PlanId,
       profileId: profile.id,
       isRenewal,
-      successUrl: `${baseUrl}/checkout/sepay/success?invoice={order_invoice_number}`,
+      invoiceNumber,
+      successUrl: `${baseUrl}/checkout/sepay/success?invoice=${invoiceNumber}`,
       errorUrl: `${baseUrl}/checkout/sepay/error`,
       cancelUrl: `${baseUrl}/checkout/sepay/cancel`,
     });
@@ -60,6 +64,7 @@ export const POST = async (request: Request): Promise<Response> => {
     return NextResponse.json({
       checkoutUrl: result.checkoutUrl,
       invoiceNumber: result.invoiceNumber,
+      formFields: result.formFields,
       ok: true,
     });
   } catch (error) {

@@ -1,46 +1,73 @@
 "use client";
 
-import type {
-  CreditBalance,
-  CreditPack,
-  TransactionHistoryResponse,
-} from "@repo/credits";
-import { Loader2 } from "lucide-react";
+import type { CreditBalance, CreditPack } from "@repo/credits";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+} from "@repo/design-system/components/ui/card";
+import { Skeleton } from "@repo/design-system/components/ui/skeleton";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import {
   CreditsBalance,
-  CreditsHistory,
   CreditsPackCard,
   ExpiringCreditsWarning,
   LowCreditsWarning,
 } from "../components/credits";
 
+function CreditsBalanceSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-4 w-48" />
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-lg bg-muted/50 p-6 text-center">
+          <Skeleton className="mx-auto h-12 w-24" />
+          <Skeleton className="mx-auto mt-2 h-4 w-32" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CreditsPackSkeleton() {
+  return (
+    <Card className="flex flex-col">
+      <CardHeader>
+        <Skeleton className="h-5 w-24" />
+        <Skeleton className="h-8 w-20" />
+      </CardHeader>
+      <CardContent className="flex-1 space-y-2">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+      </CardContent>
+      <div className="space-y-3 p-6 pt-0">
+        <Skeleton className="mx-auto h-6 w-24" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    </Card>
+  );
+}
+
 export function CreditsContent() {
   const [balance, setBalance] = useState<CreditBalance | null>(null);
-  const [history, setHistory] = useState<TransactionHistoryResponse | null>(
-    null
-  );
   const [packs, setPacks] = useState<CreditPack[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [balanceRes, historyRes, packsRes] = await Promise.all([
+        const [balanceRes, packsRes] = await Promise.all([
           fetch("/api/credits/balance"),
-          fetch("/api/credits/history?limit=10"),
           fetch("/api/credits/packs"),
         ]);
 
         if (balanceRes.ok) {
           const balanceData = await balanceRes.json();
           setBalance(balanceData);
-        }
-
-        if (historyRes.ok) {
-          const historyData = await historyRes.json();
-          setHistory(historyData);
         }
 
         if (packsRes.ok) {
@@ -57,39 +84,24 @@ export function CreditsContent() {
     fetchData();
   }, []);
 
-  const handlePurchasePack = async (
-    packId: string,
-    provider: "paypal" | "sepay"
-  ) => {
-    try {
-      const res = await fetch("/api/credits/packs/purchase", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packId, provider }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.approvalUrl) {
-          window.location.href = data.approvalUrl;
-        } else if (data.checkoutUrl) {
-          window.location.href = data.checkoutUrl;
-        }
-      } else {
-        const error = await res.json();
-        console.error("Purchase failed:", error);
-        toast.error(error.message || "Failed to initiate purchase");
-      }
-    } catch (error) {
-      console.error("Purchase error:", error);
-      toast.error("An error occurred while processing your purchase");
-    }
-  };
-
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="space-y-6">
+        {/* Balance Skeleton */}
+        <div className="mx-auto max-w-md">
+          <CreditsBalanceSkeleton />
+        </div>
+
+        {/* Credit Packs Skeleton */}
+        <div>
+          <Skeleton className="mb-2 h-6 w-48" />
+          <Skeleton className="mb-6 h-4 w-96" />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <CreditsPackSkeleton />
+            <CreditsPackSkeleton />
+            <CreditsPackSkeleton />
+          </div>
+        </div>
       </div>
     );
   }
@@ -111,11 +123,12 @@ export function CreditsContent() {
         </div>
       )}
 
-      {/* Balance & History Grid */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {balance && <CreditsBalance balance={balance} />}
-        {history && <CreditsHistory initialHistory={history} />}
-      </div>
+      {/* Balance Card */}
+      {balance && (
+        <div className="mx-auto max-w-md">
+          <CreditsBalance balance={balance} />
+        </div>
+      )}
 
       {/* Credit Packs Section */}
       {packs.length > 0 && (
@@ -127,11 +140,7 @@ export function CreditsContent() {
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {packs.map((pack) => (
-              <CreditsPackCard
-                key={pack.id}
-                onPurchase={handlePurchasePack}
-                pack={pack}
-              />
+              <CreditsPackCard key={pack.id} pack={pack} />
             ))}
           </div>
         </div>

@@ -1,5 +1,14 @@
 "use client";
 
+import { Button } from "@repo/design-system/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@repo/design-system/components/ui/card";
 import { XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -8,35 +17,32 @@ export default function PayPalCancelPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <div className="mx-auto max-w-md text-center">
-        <div className="mb-6 flex justify-center">
-          <XCircle className="h-16 w-16 text-yellow-500" />
-        </div>
+      <Card className="mx-auto max-w-md">
+        <CardHeader className="text-center">
+          <div className="mb-4 flex justify-center">
+            <XCircle className="h-16 w-16 text-yellow-500" />
+          </div>
+          <CardTitle className="text-2xl">Payment Cancelled</CardTitle>
+          <CardDescription>
+            Your PayPal payment was cancelled. No charges were made.
+          </CardDescription>
+        </CardHeader>
 
-        <h1 className="mb-2 font-bold text-2xl">Payment Cancelled</h1>
+        <CardContent />
 
-        <p className="mb-6 text-muted-foreground">
-          Your PayPal payment was cancelled. No charges were made.
-        </p>
-
-        <div className="flex flex-col gap-2">
-          <button
-            className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-            onClick={() => router.push("/pricing")}
-            type="button"
-          >
+        <CardFooter className="flex-col gap-2">
+          <Button className="w-full" onClick={() => router.push("/pricing")}>
             Try again
-          </button>
-
-          <button
-            className="text-muted-foreground text-sm underline"
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full"
             onClick={() => router.push("/")}
-            type="button"
           >
             Return home
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

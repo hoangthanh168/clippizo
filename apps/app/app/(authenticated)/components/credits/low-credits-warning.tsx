@@ -1,12 +1,18 @@
 "use client";
 
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@repo/design-system/components/ui/alert";
+import { Button } from "@repo/design-system/components/ui/button";
 import { AlertTriangle, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
 type LowCreditsWarningProps = {
-  currentBalance: number;
-  dismissible?: boolean;
+  readonly currentBalance: number;
+  readonly dismissible?: boolean;
 };
 
 export function LowCreditsWarning({
@@ -14,45 +20,38 @@ export function LowCreditsWarning({
   dismissible = true,
 }: LowCreditsWarningProps) {
   const [dismissed, setDismissed] = useState(false);
-  const router = useRouter();
 
   if (dismissed) {
     return null;
   }
 
   return (
-    <div className="relative rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950">
-      <div className="flex items-start gap-3">
-        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-500" />
-        <div className="flex-grow">
-          <h4 className="font-medium text-yellow-800 dark:text-yellow-200">
-            Low Credits Balance
-          </h4>
-          <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
-            You have only{" "}
-            <span className="font-semibold">{currentBalance}</span> credits
-            remaining. Purchase a credit pack to continue using AI features
-            without interruption.
-          </p>
-          <button
-            className="mt-2 font-medium text-sm text-yellow-800 underline hover:no-underline dark:text-yellow-200"
-            onClick={() => router.push("/credits")}
-            type="button"
-          >
-            Purchase Credits
-          </button>
-        </div>
-        {dismissible === true ? (
-          <button
-            aria-label="Dismiss"
-            className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-200"
+    <Alert className="border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-900 dark:bg-yellow-950 dark:text-yellow-200">
+      <AlertTriangle className="text-yellow-600 dark:text-yellow-500" />
+      <AlertTitle className="flex items-center justify-between">
+        <span>Low Credits Balance</span>
+        {dismissible && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-6 w-6 text-yellow-600 hover:bg-yellow-100 hover:text-yellow-800 dark:text-yellow-400 dark:hover:bg-yellow-900 dark:hover:text-yellow-200"
             onClick={() => setDismissed(true)}
-            type="button"
+            aria-label="Dismiss"
           >
             <X className="h-4 w-4" />
-          </button>
-        ) : null}
-      </div>
-    </div>
+          </Button>
+        )}
+      </AlertTitle>
+      <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+        <p>
+          You have only <span className="font-semibold">{currentBalance}</span>{" "}
+          credits remaining. Purchase a credit pack to continue using AI
+          features without interruption.
+        </p>
+        <Button variant="link" asChild className="h-auto p-0 text-yellow-800 dark:text-yellow-200">
+          <Link href="/credits">Purchase Credits</Link>
+        </Button>
+      </AlertDescription>
+    </Alert>
   );
 }

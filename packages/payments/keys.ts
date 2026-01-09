@@ -12,7 +12,8 @@ export const keys = () =>
 
       // SePay (optional for initial deployment)
       SEPAY_MERCHANT_ID: z.string().optional(),
-      SEPAY_SECRET_KEY: z.string().optional(),
+      SEPAY_SECRET_KEY: z.string().optional(), // API secret for checkout signature
+      SEPAY_IPN_SECRET: z.string().optional(), // IPN secret for webhook verification
       SEPAY_MODE: z.enum(["sandbox", "production"]).default("sandbox"),
     },
     runtimeEnv: {
@@ -25,6 +26,7 @@ export const keys = () =>
       // SePay
       SEPAY_MERCHANT_ID: process.env.SEPAY_MERCHANT_ID,
       SEPAY_SECRET_KEY: process.env.SEPAY_SECRET_KEY,
+      SEPAY_IPN_SECRET: process.env.SEPAY_IPN_SECRET,
       SEPAY_MODE: process.env.SEPAY_MODE,
     },
   });
