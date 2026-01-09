@@ -12,9 +12,9 @@ import {
 import { Spinner } from "@repo/design-system/components/ui/spinner";
 import { CheckCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-function SePaySuccessContent() {
+export function SePaySuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [countdown, setCountdown] = useState(5);
@@ -47,7 +47,7 @@ function SePaySuccessContent() {
       </CardHeader>
 
       <CardContent className="space-y-4 text-center">
-        {invoice && (
+        {invoice !== null && (
           <p className="text-muted-foreground text-sm">Invoice: {invoice}</p>
         )}
 
@@ -58,20 +58,10 @@ function SePaySuccessContent() {
       </CardContent>
 
       <CardFooter className="justify-center">
-        <Button variant="link" onClick={() => router.push("/billing")}>
+        <Button onClick={() => router.push("/billing")} variant="link">
           Go to billing now
         </Button>
       </CardFooter>
     </Card>
-  );
-}
-
-export default function SePaySuccessPage() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <Suspense fallback={<Spinner />}>
-        <SePaySuccessContent />
-      </Suspense>
-    </div>
   );
 }

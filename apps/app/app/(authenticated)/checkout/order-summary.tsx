@@ -85,9 +85,7 @@ export function OrderSummary({
           <div className="flex-1">
             <h3 className="flex items-center gap-2 font-semibold text-lg">
               {product.data.name}
-              {isRenewal === true && (
-                <Badge variant="secondary">Renewal</Badge>
-              )}
+              {isRenewal === true && <Badge variant="secondary">Renewal</Badge>}
             </h3>
             <p className="text-muted-foreground text-sm">{duration}</p>
           </div>

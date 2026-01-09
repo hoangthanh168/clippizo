@@ -1,9 +1,8 @@
 "use client";
 
 import { Button } from "@repo/design-system/components/ui/button";
-import { Check, Loader2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 
 const PLANS = {
   free: {
@@ -43,7 +42,7 @@ const PLANS = {
 
 type PlanId = keyof typeof PLANS;
 
-function PricingContent() {
+export function PricingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const isRenewal = searchParams.get("renew") === "true";
@@ -87,7 +86,7 @@ function PricingContent() {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-12">
+    <div className="mx-auto max-w-6xl">
       <div className="mb-12 text-center">
         <h1 className="mb-4 font-bold text-4xl">
           {isRenewal ? "Renew Your Subscription" : "Choose Your Plan"}
@@ -174,19 +173,5 @@ function PricingContent() {
         </p>
       </div>
     </div>
-  );
-}
-
-export default function PricingPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      }
-    >
-      <PricingContent />
-    </Suspense>
   );
 }

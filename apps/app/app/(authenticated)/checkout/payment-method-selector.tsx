@@ -32,9 +32,9 @@ export function PaymentMethodSelector({
 
       <CardContent>
         <RadioGroup
+          className="space-y-3"
           onValueChange={(v) => onChange(v as PaymentProvider)}
           value={value}
-          className="space-y-3"
         >
           <Label
             className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${

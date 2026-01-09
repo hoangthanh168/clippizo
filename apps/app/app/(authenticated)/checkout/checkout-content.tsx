@@ -172,6 +172,7 @@ export function CheckoutContent() {
     );
   }
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Payment flow requires multiple conditional paths
   const handleCheckout = async () => {
     setLoading(true);
     setError(null);
