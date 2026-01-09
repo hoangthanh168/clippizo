@@ -169,7 +169,7 @@ export function BillingContent() {
               {subscription.plan === "free" ? (
                 <button
                   className="rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm"
-                  onClick={() => router.push("/pricing")}
+                  onClick={() => router.push("/upgrade")}
                   type="button"
                 >
                   Upgrade Plan
@@ -178,7 +178,7 @@ export function BillingContent() {
                 <>
                   <button
                     className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm"
-                    onClick={() => router.push("/pricing?renew=true")}
+                    onClick={() => router.push("/upgrade?renew=true")}
                     type="button"
                   >
                     <RefreshCw className="h-4 w-4" />
@@ -187,7 +187,7 @@ export function BillingContent() {
                   {subscription.plan === "pro" && (
                     <button
                       className="rounded-md border px-4 py-2 text-sm"
-                      onClick={() => router.push("/pricing?upgrade=enterprise")}
+                      onClick={() => router.push("/upgrade?upgrade=enterprise")}
                       type="button"
                     >
                       Upgrade to Enterprise

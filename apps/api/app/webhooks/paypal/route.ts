@@ -214,19 +214,6 @@ export const POST = async (request: Request): Promise<Response> => {
       },
     });
 
-    // Update checkout session status
-    await database.checkoutSession.updateMany({
-      where: {
-        providerOrderId: orderId,
-        status: { in: ["pending", "processing"] },
-      },
-      data: {
-        status: "completed",
-        completedAt: new Date(),
-        paymentId: payment.id,
-      },
-    });
-
     // Activate subscription
     const subscriptionResult = await activateSubscription({
       profileId,

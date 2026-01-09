@@ -42,11 +42,13 @@ const PLANS = {
 
 type PlanId = keyof typeof PLANS;
 
-export function PricingContent() {
+export function UpgradeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const isRenewal = searchParams.get("renew") === "true";
+  const planFromWeb = searchParams.get("plan");
   const upgradeTarget = searchParams.get("upgrade");
+  const targetPlan = planFromWeb || upgradeTarget;
 
   const formatPrice = (plan: (typeof PLANS)[PlanId]) => {
     const vnd = new Intl.NumberFormat("vi-VN", {
@@ -60,8 +62,8 @@ export function PricingContent() {
     return { vnd, usd };
   };
 
-  const filteredPlans = upgradeTarget
-    ? Object.values(PLANS).filter((p) => p.id === upgradeTarget)
+  const filteredPlans = targetPlan
+    ? Object.values(PLANS).filter((p) => p.id === targetPlan)
     : Object.values(PLANS);
 
   const getGridClassName = () => {

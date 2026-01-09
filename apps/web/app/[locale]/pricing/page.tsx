@@ -78,7 +78,7 @@ const getCheckoutUrl = (planId: PlanId) => {
   if (planId === "free") {
     return env.NEXT_PUBLIC_APP_URL;
   }
-  return `${env.NEXT_PUBLIC_APP_URL}/checkout?type=subscription&id=${planId}`;
+  return `${env.NEXT_PUBLIC_APP_URL}/upgrade?plan=${planId}`;
 };
 
 const Pricing = () => (

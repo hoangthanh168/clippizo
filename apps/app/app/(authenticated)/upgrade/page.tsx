@@ -2,17 +2,17 @@ import { Loader2 } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Header } from "../components/header";
-import { PricingContent } from "./pricing-content";
+import { UpgradeContent } from "./upgrade-content";
 
 export const metadata: Metadata = {
-  title: "Pricing",
+  title: "Upgrade",
   description: "Choose the plan that best fits your needs",
 };
 
-export default function PricingPage() {
+export default function UpgradePage() {
   return (
     <>
-      <Header page="Pricing" />
+      <Header page="Upgrade" />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 p-6 md:min-h-min">
           <Suspense
@@ -22,7 +22,7 @@ export default function PricingPage() {
               </div>
             }
           >
-            <PricingContent />
+            <UpgradeContent />
           </Suspense>
         </div>
       </div>

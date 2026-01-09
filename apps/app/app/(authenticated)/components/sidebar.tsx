@@ -30,6 +30,7 @@ import { cn } from "@repo/design-system/lib/utils";
 import { NotificationsTrigger } from "@repo/notifications/components/trigger";
 import {
   AnchorIcon,
+  ArrowUpCircleIcon,
   BookOpenIcon,
   BotIcon,
   ChevronRightIcon,
@@ -146,6 +147,11 @@ const data = {
       title: "Credits",
       url: "/credits",
       icon: CoinsIcon,
+    },
+    {
+      title: "Upgrade",
+      url: "/upgrade",
+      icon: ArrowUpCircleIcon,
     },
     {
       title: "Billing",
