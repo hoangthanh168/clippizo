@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "@repo/typescript-config/nextjs.json",
-    "@repo/cms/typescript-config.json"
-  ],
+  "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -15,6 +12,7 @@
     "next.config.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "../../packages/cms/basehub-types.d.ts"
   ]
 }

@@ -1,1 +1,6 @@
-{}
+{
+  "compilerOptions": {
+    "types": []
+  },
+  "include": ["../../packages/cms/basehub-types.d.ts"]
+}

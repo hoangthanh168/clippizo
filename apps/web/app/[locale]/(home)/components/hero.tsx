@@ -1,5 +1,4 @@
-import { blog } from "@repo/cms";
-import { Feed } from "@repo/cms/components/feed";
+import { blog, type Post } from "@repo/cms";
 import { Button } from "@repo/design-system/components/ui/button";
 import type { Dictionary } from "@repo/internationalization";
 import { MoveRight, PhoneCall } from "lucide-react";
@@ -10,27 +9,33 @@ type HeroProps = {
   dictionary: Dictionary;
 };
 
-export const Hero = async ({ dictionary }: HeroProps) => (
-  <div className="w-full">
-    <div className="container mx-auto">
-      <div className="flex flex-col items-center justify-center gap-8 py-20 lg:py-40">
-        <div>
-          <Feed queries={[blog.latestPostQuery]}>
-            {/* biome-ignore lint/suspicious/useAwait: "Server Actions must be async" */}
-            {async ([data]) => {
-              "use server";
+const LatestPostAnnouncement = ({
+  post,
+  dictionary,
+}: {
+  post: Post;
+  dictionary: Dictionary;
+}) => (
+  <div>
+    <Button asChild className="gap-4" size="sm" variant="secondary">
+      <Link href={`/blog/${post._slug}`}>
+        {dictionary.web.home.hero.announcement}{" "}
+        <MoveRight className="h-4 w-4" />
+      </Link>
+    </Button>
+  </div>
+);
 
-              return (
-                <Button asChild className="gap-4" size="sm" variant="secondary">
-                  <Link href={`/blog/${data.blog.posts.item?._slug}`}>
-                    {dictionary.web.home.hero.announcement}{" "}
-                    <MoveRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              );
-            }}
-          </Feed>
-        </div>
+export const Hero = async ({ dictionary }: HeroProps) => {
+  const latestPost = await blog.getLatestPost();
+
+  return (
+    <div className="w-full">
+      <div className="container mx-auto">
+        <div className="flex flex-col items-center justify-center gap-8 py-20 lg:py-40">
+          {latestPost && (
+            <LatestPostAnnouncement post={latestPost} dictionary={dictionary} />
+          )}
         <div className="flex flex-col gap-4">
           <h1 className="max-w-2xl text-center font-regular text-5xl tracking-tighter md:text-7xl">
             {dictionary.web.home.meta.title}
@@ -51,7 +56,8 @@ export const Hero = async ({ dictionary }: HeroProps) => (
             </Link>
           </Button>
         </div>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};

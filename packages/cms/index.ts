@@ -39,7 +39,19 @@ const postMetaFragment = fragmentOn("PostsItem", {
 });
 
 const postFragment = fragmentOn("PostsItem", {
-  ...postMetaFragment,
+  _slug: true,
+  _title: true,
+  authors: {
+    _title: true,
+    avatar: imageFragment,
+    xUrl: true,
+  },
+  categories: {
+    _title: true,
+  },
+  date: true,
+  description: true,
+  image: imageFragment,
   body: {
     plainText: true,
     json: {
@@ -50,8 +62,55 @@ const postFragment = fragmentOn("PostsItem", {
   },
 });
 
-export type PostMeta = fragmentOn.infer<typeof postMetaFragment>;
-export type Post = fragmentOn.infer<typeof postFragment>;
+// Define types based on fragment selections
+export type PostMeta = {
+  _slug: string;
+  _title: string;
+  authors: Array<{
+    _title: string;
+    avatar: {
+      url: string;
+      width: number;
+      height: number;
+      alt: string | null;
+      blurDataURL: string;
+    };
+    xUrl: string | null;
+  }>;
+  categories: Array<{ _title: string }> | null;
+  date: string;
+  description: string;
+  image: {
+    url: string;
+    width: number;
+    height: number;
+    alt: string | null;
+    blurDataURL: string;
+  };
+};
+
+type RichTextContent = Array<{
+  type: string;
+  children?: unknown[];
+  [key: string]: unknown;
+}>;
+
+type RichTextToc = Array<{
+  id: string;
+  title: string;
+  depth: number;
+}>;
+
+export type Post = PostMeta & {
+  body: {
+    plainText: string;
+    json: {
+      content: RichTextContent;
+      toc: RichTextToc;
+    };
+    readingTime: number;
+  };
+};
 
 export const blog = {
   postsQuery: fragmentOn("Query", {
@@ -117,7 +176,9 @@ const legalPostMetaFragment = fragmentOn("LegalPagesItem", {
 });
 
 const legalPostFragment = fragmentOn("LegalPagesItem", {
-  ...legalPostMetaFragment,
+  _slug: true,
+  _title: true,
+  description: true,
   body: {
     plainText: true,
     json: {
@@ -128,8 +189,23 @@ const legalPostFragment = fragmentOn("LegalPagesItem", {
   },
 });
 
-export type LegalPostMeta = fragmentOn.infer<typeof legalPostMetaFragment>;
-export type LegalPost = fragmentOn.infer<typeof legalPostFragment>;
+// Define types based on fragment selections
+export type LegalPostMeta = {
+  _slug: string;
+  _title: string;
+  description: string;
+};
+
+export type LegalPost = LegalPostMeta & {
+  body: {
+    plainText: string;
+    json: {
+      content: RichTextContent;
+      toc: RichTextToc;
+    };
+    readingTime: number;
+  };
+};
 
 export const legal = {
   postsQuery: fragmentOn("Query", {
