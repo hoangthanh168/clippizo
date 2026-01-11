@@ -50,19 +50,14 @@ const FAQ_ITEMS = [
 export function FAQSection() {
   return (
     <div className="rounded-xl border bg-card p-6">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h2 className="font-semibold text-xl">Frequently Asked Questions</h2>
-        <div className="flex items-center gap-3">
-          <span className="text-muted-foreground text-sm">
-            Have a question?
-          </span>
-          <Button asChild size="sm" variant="outline">
-            <a href="mailto:support@clippizo.com">
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Contact Support
-            </a>
-          </Button>
-        </div>
+        <Button asChild className="w-fit" size="sm" variant="outline">
+          <a href="mailto:support@clippizo.com">
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Contact Support
+          </a>
+        </Button>
       </div>
 
       <Accordion className="w-full" collapsible type="single">

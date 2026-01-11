@@ -82,7 +82,7 @@ export function UpgradeContent() {
   }
 
   return (
-    <div className="w-full space-y-8">
+    <div className="w-full space-y-8 pb-20 md:pb-0">
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <CreditStatus credits={credits} subscription={subscription} />
         <BillingToggle />
@@ -95,19 +95,6 @@ export function UpgradeContent() {
       />
 
       <FAQSection />
-
-      <div className="text-center text-muted-foreground text-sm">
-        <p>
-          Subscriptions are one-time payments valid for 30 days. Renew manually
-          before expiry to maintain access.
-        </p>
-        <p className="mt-2">
-          Need help?{" "}
-          <a className="text-primary" href="mailto:support@clippizo.com">
-            Contact support
-          </a>
-        </p>
-      </div>
     </div>
   );
 }
