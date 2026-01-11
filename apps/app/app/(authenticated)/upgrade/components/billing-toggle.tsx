@@ -29,27 +29,24 @@ export function BillingToggle({
         >
           Yearly
         </Label>
-        <Badge className="bg-green-100 text-green-800" variant="secondary">
-          Coming soon
-        </Badge>
+        <Badge variant="secondary">Coming soon</Badge>
       </div>
 
       {showNavArrows === true && (
         <div className="ml-2 flex gap-1">
-          <button
-            className="flex h-7 w-7 items-center justify-center rounded border hover:bg-muted"
-            onClick={onScrollLeft}
-            type="button"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            className="flex h-7 w-7 items-center justify-center rounded border hover:bg-muted"
-            onClick={onScrollRight}
-            type="button"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
+          {[
+            { key: "left", icon: ChevronLeft, onClick: onScrollLeft },
+            { key: "right", icon: ChevronRight, onClick: onScrollRight },
+          ].map(({ key, icon: Icon, onClick }) => (
+            <button
+              className="flex h-7 w-7 items-center justify-center rounded border hover:bg-muted"
+              key={key}
+              onClick={onClick}
+              type="button"
+            >
+              <Icon className="h-4 w-4" />
+            </button>
+          ))}
         </div>
       )}
     </div>
