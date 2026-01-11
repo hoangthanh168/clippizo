@@ -18,8 +18,9 @@ datasource db {
 
 enum Plan {
   free
+  starter
   pro
-  enterprise
+  max
 }
 
 enum SubscriptionStatus {

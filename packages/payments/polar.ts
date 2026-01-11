@@ -127,13 +127,17 @@ function getPolarProductId(
 
   const productMap: Record<PlanId, Record<BillingPeriod, string | undefined>> = {
     free: { monthly: undefined, yearly: undefined },
+    starter: {
+      monthly: env.POLAR_PRODUCT_STARTER,
+      yearly: env.POLAR_PRODUCT_STARTER_YEARLY,
+    },
     pro: {
       monthly: env.POLAR_PRODUCT_PRO,
       yearly: env.POLAR_PRODUCT_PRO_YEARLY,
     },
-    enterprise: {
-      monthly: env.POLAR_PRODUCT_ENTERPRISE,
-      yearly: env.POLAR_PRODUCT_ENTERPRISE_YEARLY,
+    max: {
+      monthly: env.POLAR_PRODUCT_MAX,
+      yearly: env.POLAR_PRODUCT_MAX_YEARLY,
     },
   };
 
@@ -181,19 +185,25 @@ export function getPlanIdFromPolarProduct(
   const env = keys();
 
   // Monthly products
+  if (productId === env.POLAR_PRODUCT_STARTER) {
+    return { planId: "starter", billingPeriod: "monthly" };
+  }
   if (productId === env.POLAR_PRODUCT_PRO) {
     return { planId: "pro", billingPeriod: "monthly" };
   }
-  if (productId === env.POLAR_PRODUCT_ENTERPRISE) {
-    return { planId: "enterprise", billingPeriod: "monthly" };
+  if (productId === env.POLAR_PRODUCT_MAX) {
+    return { planId: "max", billingPeriod: "monthly" };
   }
 
   // Yearly products
+  if (productId === env.POLAR_PRODUCT_STARTER_YEARLY) {
+    return { planId: "starter", billingPeriod: "yearly" };
+  }
   if (productId === env.POLAR_PRODUCT_PRO_YEARLY) {
     return { planId: "pro", billingPeriod: "yearly" };
   }
-  if (productId === env.POLAR_PRODUCT_ENTERPRISE_YEARLY) {
-    return { planId: "enterprise", billingPeriod: "yearly" };
+  if (productId === env.POLAR_PRODUCT_MAX_YEARLY) {
+    return { planId: "max", billingPeriod: "yearly" };
   }
 
   return null;

@@ -1,5 +1,8 @@
 import type { CreditPack, CreditPackId } from "./types";
 
+// Fixed exchange rate: 1 USD = 26,000 VND
+export const USD_TO_VND_RATE = 26_000;
+
 /**
  * Credit pack definitions
  */
@@ -9,7 +12,6 @@ export const CREDIT_PACKS: Record<CreditPackId, CreditPack> = {
     name: "Starter",
     credits: 500,
     priceUSD: 9.99,
-    priceVND: 249_000,
     validityDays: 90,
   },
   small: {
@@ -17,7 +19,6 @@ export const CREDIT_PACKS: Record<CreditPackId, CreditPack> = {
     name: "Basic",
     credits: 1200,
     priceUSD: 19.99,
-    priceVND: 499_000,
     validityDays: 90,
   },
   medium: {
@@ -25,7 +26,6 @@ export const CREDIT_PACKS: Record<CreditPackId, CreditPack> = {
     name: "Standard",
     credits: 2500,
     priceUSD: 39.99,
-    priceVND: 999_000,
     validityDays: 90,
   },
   large: {
@@ -33,7 +33,6 @@ export const CREDIT_PACKS: Record<CreditPackId, CreditPack> = {
     name: "Pro",
     credits: 5000,
     priceUSD: 69.99,
-    priceVND: 1_749_000,
     validityDays: 90,
   },
   xlarge: {
@@ -41,7 +40,6 @@ export const CREDIT_PACKS: Record<CreditPackId, CreditPack> = {
     name: "Business",
     credits: 10_000,
     priceUSD: 129.99,
-    priceVND: 3_249_000,
     validityDays: 90,
   },
   enterprise: {
@@ -49,7 +47,6 @@ export const CREDIT_PACKS: Record<CreditPackId, CreditPack> = {
     name: "Enterprise",
     credits: 25_000,
     priceUSD: 299.99,
-    priceVND: 7_499_000,
     validityDays: 90,
   },
 } as const;
@@ -83,5 +80,5 @@ export function getPackPrice(
   currency: "USD" | "VND"
 ): number {
   const pack = CREDIT_PACKS[packId];
-  return currency === "USD" ? pack.priceUSD : pack.priceVND;
+  return currency === "USD" ? pack.priceUSD : pack.priceUSD * USD_TO_VND_RATE;
 }

@@ -1,8 +1,10 @@
-export type PlanId = "free" | "pro" | "enterprise";
+export type PlanId = "free" | "starter" | "pro" | "max";
 export type BillingPeriod = "monthly" | "yearly";
 
+// Fixed exchange rate: 1 USD = 26,000 VND
+export const USD_TO_VND_RATE = 26_000;
+
 export interface PeriodPricing {
-  priceVND: number;
   priceUSD: number;
   durationDays: number;
 }
@@ -31,9 +33,8 @@ export const PLANS: Record<PlanId, SubscriptionPlan> = {
     id: "free",
     name: "Free",
     pricing: {
-      monthly: { priceVND: 0, priceUSD: 0, durationDays: 0 },
+      monthly: { priceUSD: 0, durationDays: 0 },
       yearly: {
-        priceVND: 0,
         priceUSD: 0,
         durationDays: 0,
         discount: 0,
@@ -41,47 +42,69 @@ export const PLANS: Record<PlanId, SubscriptionPlan> = {
       },
     },
     features: ["read-only"],
-    monthlyCredits: 50,
+    monthlyCredits: 100,
     rolloverCapMultiplier: 1,
   },
-  pro: {
-    id: "pro",
-    name: "Pro",
+  starter: {
+    id: "starter",
+    name: "Starter",
     pricing: {
-      monthly: { priceVND: 99_000, priceUSD: 9.99, durationDays: 30 },
+      monthly: { priceUSD: 20, durationDays: 30 },
       yearly: {
-        priceVND: 950_400,
-        priceUSD: 95.9,
+        priceUSD: 192,
         durationDays: 365,
         discount: 0.2,
         creditsUpfront: 6000,
       },
     },
-    features: ["full-access", "unlimited-videos", "rag-search"],
+    features: ["ai-image-generation", "ai-video-generation"],
     monthlyCredits: 500,
     rolloverCapMultiplier: 2,
   },
-  enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
+  pro: {
+    id: "pro",
+    name: "Pro",
     pricing: {
-      monthly: { priceVND: 299_000, priceUSD: 29.99, durationDays: 30 },
+      monthly: { priceUSD: 30, durationDays: 30 },
       yearly: {
-        priceVND: 2_871_360,
-        priceUSD: 287.9,
+        priceUSD: 288,
         durationDays: 365,
         discount: 0.2,
-        creditsUpfront: 24000,
+        creditsUpfront: 18000,
       },
     },
     features: [
-      "full-access",
-      "unlimited-videos",
+      "ai-image-generation",
+      "ai-video-generation",
       "rag-search",
+      "export-transcripts",
       "priority-support",
       "api-access",
     ],
-    monthlyCredits: 2000,
+    monthlyCredits: 1500,
+    rolloverCapMultiplier: 2,
+  },
+  max: {
+    id: "max",
+    name: "Max",
+    pricing: {
+      monthly: { priceUSD: 60, durationDays: 30 },
+      yearly: {
+        priceUSD: 576,
+        durationDays: 365,
+        discount: 0.2,
+        creditsUpfront: 60000,
+      },
+    },
+    features: [
+      "ai-image-generation",
+      "ai-video-generation",
+      "rag-search",
+      "export-transcripts",
+      "priority-support",
+      "api-access",
+    ],
+    monthlyCredits: 5000,
     rolloverCapMultiplier: 2,
   },
 } as const;
@@ -96,8 +119,8 @@ export function getPlanPrice(
   billingPeriod: BillingPeriod = "monthly"
 ): number {
   const plan = PLANS[planId];
-  const pricing = plan.pricing[billingPeriod];
-  return currency === "VND" ? pricing.priceVND : pricing.priceUSD;
+  const priceUSD = plan.pricing[billingPeriod].priceUSD;
+  return currency === "VND" ? priceUSD * USD_TO_VND_RATE : priceUSD;
 }
 
 export function getPlanDuration(
@@ -111,8 +134,8 @@ export function getYearlyCredits(planId: PlanId): number {
   return PLANS[planId].pricing.yearly.creditsUpfront;
 }
 
-export function isPaidPlan(planId: string): planId is "pro" | "enterprise" {
-  return planId === "pro" || planId === "enterprise";
+export function isPaidPlan(planId: string): planId is "starter" | "pro" | "max" {
+  return planId === "starter" || planId === "pro" || planId === "max";
 }
 
 export function getPlanCredits(planId: PlanId): number {

@@ -23,9 +23,11 @@ type CreditStatusProps = {
 
 const getPlanBadgeVariant = (plan: string) => {
   switch (plan) {
-    case "enterprise":
+    case "max":
       return "default";
     case "pro":
+      return "secondary";
+    case "starter":
       return "secondary";
     default:
       return "outline";

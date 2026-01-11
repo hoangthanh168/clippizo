@@ -1,4 +1,4 @@
-export type PlanId = "free" | "pro" | "enterprise";
+export type PlanId = "free" | "starter" | "pro" | "max";
 export type BillingPeriod = "monthly" | "yearly";
 
 export type PlanPricing = {
@@ -28,9 +28,9 @@ export const PLANS: Record<PlanId, Plan> = {
       monthly: { priceUSD: 0 },
       yearly: { priceUSD: 0, monthlyEquivalent: 0, discount: 0 },
     },
-    credits: { monthly: 50, yearly: 0 },
+    credits: { monthly: 100, yearly: 0 },
     features: {
-      "Monthly Credits": "50 credits",
+      "Monthly Credits": "100 credits",
       "Additional Credits": false,
       "AI Image Generation": false,
       "AI Video Generation": false,
@@ -40,38 +40,58 @@ export const PLANS: Record<PlanId, Plan> = {
       "API Access": false,
     },
   },
-  pro: {
-    id: "pro",
-    name: "Pro",
-    description: "Perfect for creators who need full access to AI video tools.",
+  starter: {
+    id: "starter",
+    name: "Starter",
+    description: "For individuals getting started with AI video creation.",
     pricing: {
-      monthly: { priceUSD: 9.99 },
-      yearly: { priceUSD: 95.9, monthlyEquivalent: 7.99, discount: 0.2 },
+      monthly: { priceUSD: 20 },
+      yearly: { priceUSD: 192, monthlyEquivalent: 16, discount: 0.2 },
     },
     credits: { monthly: 500, yearly: 6000 },
-    popular: true,
     features: {
       "Monthly Credits": "500 credits",
       "Additional Credits": "Purchase packs",
       "AI Image Generation": true,
       "AI Video Generation": true,
-      "RAG Search": true,
-      "Export Transcripts": true,
+      "RAG Search": false,
+      "Export Transcripts": false,
       "Priority Support": false,
       "API Access": false,
     },
   },
-  enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
-    description: "For teams and businesses with advanced needs and support.",
+  pro: {
+    id: "pro",
+    name: "Pro",
+    description: "Perfect for creators who need full access to all features.",
     pricing: {
-      monthly: { priceUSD: 29.99 },
-      yearly: { priceUSD: 287.9, monthlyEquivalent: 23.99, discount: 0.2 },
+      monthly: { priceUSD: 30 },
+      yearly: { priceUSD: 288, monthlyEquivalent: 24, discount: 0.2 },
     },
-    credits: { monthly: 2000, yearly: 24000 },
+    credits: { monthly: 1500, yearly: 18000 },
+    popular: true,
     features: {
-      "Monthly Credits": "2000 credits",
+      "Monthly Credits": "1,500 credits",
+      "Additional Credits": "Purchase packs",
+      "AI Image Generation": true,
+      "AI Video Generation": true,
+      "RAG Search": true,
+      "Export Transcripts": true,
+      "Priority Support": true,
+      "API Access": true,
+    },
+  },
+  max: {
+    id: "max",
+    name: "Max",
+    description: "For power users and teams with high-volume needs.",
+    pricing: {
+      monthly: { priceUSD: 60 },
+      yearly: { priceUSD: 576, monthlyEquivalent: 48, discount: 0.2 },
+    },
+    credits: { monthly: 5000, yearly: 60000 },
+    features: {
+      "Monthly Credits": "5,000 credits",
       "Additional Credits": "Purchase packs",
       "AI Image Generation": true,
       "AI Video Generation": true,
@@ -83,7 +103,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
 };
 
-export const PLAN_ORDER: PlanId[] = ["free", "pro", "enterprise"];
+export const PLAN_ORDER: PlanId[] = ["free", "starter", "pro", "max"];
 
 export const FEATURE_SECTIONS = [
   {
@@ -134,7 +154,7 @@ export const getCreditsDisplay = (
   billingPeriod: BillingPeriod
 ): string => {
   const plan = PLANS[planId];
-  if (planId === "free") return "50 credits";
+  if (planId === "free") return "100 credits";
 
   const credits =
     billingPeriod === "yearly" ? plan.credits.yearly : plan.credits.monthly;

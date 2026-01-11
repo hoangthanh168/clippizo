@@ -22,11 +22,13 @@ export const keys = () =>
       POLAR_MODE: z.enum(["sandbox", "production"]).default("sandbox"),
       // Polar product IDs (from Polar dashboard)
       // Subscriptions - Monthly
+      POLAR_PRODUCT_STARTER: z.string().optional(),
       POLAR_PRODUCT_PRO: z.string().optional(),
-      POLAR_PRODUCT_ENTERPRISE: z.string().optional(),
+      POLAR_PRODUCT_MAX: z.string().optional(),
       // Subscriptions - Yearly
+      POLAR_PRODUCT_STARTER_YEARLY: z.string().optional(),
       POLAR_PRODUCT_PRO_YEARLY: z.string().optional(),
-      POLAR_PRODUCT_ENTERPRISE_YEARLY: z.string().optional(),
+      POLAR_PRODUCT_MAX_YEARLY: z.string().optional(),
       // Credit packs
       POLAR_PRODUCT_PACK_STARTER: z.string().optional(),
       POLAR_PRODUCT_PACK_SMALL: z.string().optional(),
@@ -52,10 +54,12 @@ export const keys = () =>
       POLAR_ACCESS_TOKEN: process.env.POLAR_ACCESS_TOKEN,
       POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET,
       POLAR_MODE: process.env.POLAR_MODE,
+      POLAR_PRODUCT_STARTER: process.env.POLAR_PRODUCT_STARTER,
       POLAR_PRODUCT_PRO: process.env.POLAR_PRODUCT_PRO,
-      POLAR_PRODUCT_ENTERPRISE: process.env.POLAR_PRODUCT_ENTERPRISE,
+      POLAR_PRODUCT_MAX: process.env.POLAR_PRODUCT_MAX,
+      POLAR_PRODUCT_STARTER_YEARLY: process.env.POLAR_PRODUCT_STARTER_YEARLY,
       POLAR_PRODUCT_PRO_YEARLY: process.env.POLAR_PRODUCT_PRO_YEARLY,
-      POLAR_PRODUCT_ENTERPRISE_YEARLY: process.env.POLAR_PRODUCT_ENTERPRISE_YEARLY,
+      POLAR_PRODUCT_MAX_YEARLY: process.env.POLAR_PRODUCT_MAX_YEARLY,
       POLAR_PRODUCT_PACK_STARTER: process.env.POLAR_PRODUCT_PACK_STARTER,
       POLAR_PRODUCT_PACK_SMALL: process.env.POLAR_PRODUCT_PACK_SMALL,
       POLAR_PRODUCT_PACK_MEDIUM: process.env.POLAR_PRODUCT_PACK_MEDIUM,

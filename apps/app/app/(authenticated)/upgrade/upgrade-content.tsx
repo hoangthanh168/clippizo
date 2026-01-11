@@ -7,10 +7,8 @@ import { useEffect, useState } from "react";
 import { BillingToggle } from "./components/billing-toggle";
 import { CreditStatus } from "./components/credit-status";
 import { FAQSection } from "./components/faq-section";
-import type { BillingPeriod } from "./components/pricing-data";
+import type { BillingPeriod, PlanId } from "./components/pricing-data";
 import { PricingTable } from "./components/pricing-table";
-
-type PlanId = "free" | "pro" | "enterprise";
 
 type SubscriptionInfo = {
   plan: PlanId;

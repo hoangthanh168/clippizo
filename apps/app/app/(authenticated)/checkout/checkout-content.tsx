@@ -25,53 +25,77 @@ export type BillingPeriod = "monthly" | "yearly";
 
 type CheckoutType = "subscription" | "pack";
 
+// Fixed exchange rate: 1 USD = 26,000 VND
+const USD_TO_VND_RATE = 26_000;
+
 const SUBSCRIPTION_PLANS = {
-  pro: {
-    id: "pro",
-    name: "Pro",
+  starter: {
+    id: "starter",
+    name: "Starter",
     pricing: {
-      monthly: { priceVND: 99_000, priceUSD: 9.99, durationDays: 30 },
-      yearly: { priceVND: 950_400, priceUSD: 95.9, durationDays: 365 },
+      monthly: { priceUSD: 20, durationDays: 30 },
+      yearly: { priceUSD: 192, durationDays: 365 },
     },
     features: {
       monthly: [
-        "Full access to all features",
-        "Unlimited videos",
-        "RAG search",
-        "Export transcripts",
+        "AI Image Generation",
+        "AI Video Generation",
         "500 monthly credits",
       ],
       yearly: [
-        "Full access to all features",
-        "Unlimited videos",
-        "RAG search",
-        "Export transcripts",
+        "AI Image Generation",
+        "AI Video Generation",
         "6,000 credits upfront",
         "Save 20%",
       ],
     },
   },
-  enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
+  pro: {
+    id: "pro",
+    name: "Pro",
     pricing: {
-      monthly: { priceVND: 299_000, priceUSD: 29.99, durationDays: 30 },
-      yearly: { priceVND: 2_871_360, priceUSD: 287.9, durationDays: 365 },
+      monthly: { priceUSD: 30, durationDays: 30 },
+      yearly: { priceUSD: 288, durationDays: 365 },
+    },
+    features: {
+      monthly: [
+        "Full access to all features",
+        "RAG search",
+        "Export transcripts",
+        "Priority support",
+        "API access",
+        "1,500 monthly credits",
+      ],
+      yearly: [
+        "Full access to all features",
+        "RAG search",
+        "Export transcripts",
+        "Priority support",
+        "API access",
+        "18,000 credits upfront",
+        "Save 20%",
+      ],
+    },
+  },
+  max: {
+    id: "max",
+    name: "Max",
+    pricing: {
+      monthly: { priceUSD: 60, durationDays: 30 },
+      yearly: { priceUSD: 576, durationDays: 365 },
     },
     features: {
       monthly: [
         "Everything in Pro",
-        "Priority support",
-        "API access",
-        "Custom integrations",
-        "2,000 monthly credits",
+        "For power users",
+        "High-volume needs",
+        "5,000 monthly credits",
       ],
       yearly: [
         "Everything in Pro",
-        "Priority support",
-        "API access",
-        "Custom integrations",
-        "24,000 credits upfront",
+        "For power users",
+        "High-volume needs",
+        "60,000 credits upfront",
         "Save 20%",
       ],
     },
@@ -85,7 +109,6 @@ const CREDIT_PACKS = {
     name: "Starter",
     credits: 500,
     priceUSD: 9.99,
-    priceVND: 249_000,
     validityDays: 90,
     features: [
       "500 credits",
@@ -98,7 +121,6 @@ const CREDIT_PACKS = {
     name: "Basic",
     credits: 1200,
     priceUSD: 19.99,
-    priceVND: 499_000,
     validityDays: 90,
     features: [
       "1,200 credits",
@@ -111,7 +133,6 @@ const CREDIT_PACKS = {
     name: "Standard",
     credits: 2500,
     priceUSD: 39.99,
-    priceVND: 999_000,
     validityDays: 90,
     features: [
       "2,500 credits",
@@ -124,7 +145,6 @@ const CREDIT_PACKS = {
     name: "Pro",
     credits: 5000,
     priceUSD: 69.99,
-    priceVND: 1_749_000,
     validityDays: 90,
     features: [
       "5,000 credits",
@@ -137,7 +157,6 @@ const CREDIT_PACKS = {
     name: "Business",
     credits: 10_000,
     priceUSD: 129.99,
-    priceVND: 3_249_000,
     validityDays: 90,
     features: [
       "10,000 credits",
@@ -150,7 +169,6 @@ const CREDIT_PACKS = {
     name: "Enterprise",
     credits: 25_000,
     priceUSD: 299.99,
-    priceVND: 7_499_000,
     validityDays: 90,
     features: [
       "25,000 credits",
@@ -215,7 +233,7 @@ export function CheckoutContent() {
           data: {
             id: plan.id,
             name: plan.name,
-            priceVND: pricing.priceVND,
+            priceVND: pricing.priceUSD * USD_TO_VND_RATE,
             priceUSD: pricing.priceUSD,
             durationDays: pricing.durationDays,
             features,
@@ -226,9 +244,13 @@ export function CheckoutContent() {
       return null;
     }
     if (isValidPackId(id)) {
+      const pack = CREDIT_PACKS[id];
       return {
         type: "pack" as const,
-        data: CREDIT_PACKS[id],
+        data: {
+          ...pack,
+          priceVND: pack.priceUSD * USD_TO_VND_RATE,
+        },
         billingPeriod: "monthly" as BillingPeriod,
       };
     }

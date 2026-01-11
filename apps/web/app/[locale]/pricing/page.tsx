@@ -9,45 +9,60 @@ const PLANS = {
     name: "Free",
     description: "Get started with basic features to explore the platform.",
     priceUSD: 0,
-    priceVND: 0,
     features: {
-      "Monthly Credits": "50 credits",
+      "Monthly Credits": "100 credits",
       "AI Image Generation": false,
       "AI Video Generation": false,
       "RAG Search": false,
       "Export Transcripts": false,
       "Priority Support": false,
+      "API Access": false,
+    },
+  },
+  starter: {
+    id: "starter",
+    name: "Starter",
+    description: "For individuals getting started with AI video creation.",
+    priceUSD: 20,
+    features: {
+      "Monthly Credits": "500 credits",
+      "AI Image Generation": true,
+      "AI Video Generation": true,
+      "RAG Search": false,
+      "Export Transcripts": false,
+      "Priority Support": false,
+      "API Access": false,
     },
   },
   pro: {
     id: "pro",
     name: "Pro",
-    description: "Perfect for creators who need full access to AI video tools.",
-    priceUSD: 9.99,
-    priceVND: 99_000,
+    description: "Perfect for creators who need full access to all features.",
+    priceUSD: 30,
     popular: true,
     features: {
-      "Monthly Credits": "500 credits",
-      "AI Image Generation": true,
-      "AI Video Generation": true,
-      "RAG Search": true,
-      "Export Transcripts": true,
-      "Priority Support": false,
-    },
-  },
-  enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
-    description: "For teams and businesses with advanced needs and support.",
-    priceUSD: 29.99,
-    priceVND: 299_000,
-    features: {
-      "Monthly Credits": "2000 credits",
+      "Monthly Credits": "1,500 credits",
       "AI Image Generation": true,
       "AI Video Generation": true,
       "RAG Search": true,
       "Export Transcripts": true,
       "Priority Support": true,
+      "API Access": true,
+    },
+  },
+  max: {
+    id: "max",
+    name: "Max",
+    description: "For power users and teams with high-volume needs.",
+    priceUSD: 60,
+    features: {
+      "Monthly Credits": "5,000 credits",
+      "AI Image Generation": true,
+      "AI Video Generation": true,
+      "RAG Search": true,
+      "Export Transcripts": true,
+      "Priority Support": true,
+      "API Access": true,
     },
   },
 } as const;
@@ -59,6 +74,7 @@ const featureKeys = [
   "RAG Search",
   "Export Transcripts",
   "Priority Support",
+  "API Access",
 ] as const;
 
 type PlanId = keyof typeof PLANS;
@@ -93,8 +109,8 @@ const Pricing = () => (
             include a 30-day subscription.
           </p>
         </div>
-        <div className="grid w-full grid-cols-3 divide-x pt-20 text-left lg:grid-cols-4">
-          <div className="col-span-3 lg:col-span-1" />
+        <div className="grid w-full grid-cols-4 divide-x pt-20 text-left lg:grid-cols-5">
+          <div className="col-span-4 lg:col-span-1" />
           {Object.values(PLANS).map((plan) => (
             <div
               className="flex flex-col gap-2 px-3 py-1 md:px-6 md:py-4"
@@ -119,11 +135,6 @@ const Pricing = () => (
                   <span className="text-muted-foreground text-sm">/ month</span>
                 )}
               </p>
-              {plan.priceVND > 0 && (
-                <p className="text-muted-foreground text-sm">
-                  ~{formatPrice(plan.priceVND, "VND")}
-                </p>
-              )}
               <Button
                 asChild
                 className="mt-8 gap-4"
@@ -136,9 +147,10 @@ const Pricing = () => (
               </Button>
             </div>
           ))}
-          <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">
+          <div className="col-span-4 px-3 py-4 lg:col-span-1 lg:px-6">
             <b>Features</b>
           </div>
+          <div />
           <div />
           <div />
           <div />
@@ -153,7 +165,7 @@ const Pricing = () => (
 
 const FeatureRow = ({ feature }: { readonly feature: string }) => (
   <>
-    <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">{feature}</div>
+    <div className="col-span-4 px-3 py-4 lg:col-span-1 lg:px-6">{feature}</div>
     {Object.values(PLANS).map((plan) => {
       const value = plan.features[feature as keyof typeof plan.features];
       return (

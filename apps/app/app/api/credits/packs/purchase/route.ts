@@ -3,6 +3,7 @@ import {
   getCreditPack,
   isValidPackId,
   purchasePackSchema,
+  USD_TO_VND_RATE,
 } from "@repo/credits";
 import { database } from "@repo/database";
 import { parseError } from "@repo/observability/error";
@@ -118,7 +119,7 @@ export const POST = async (request: Request): Promise<Response> => {
       const result = await createSePayPackCheckout({
         packId: pack.id,
         packName: pack.name,
-        priceVND: pack.priceVND,
+        priceVND: pack.priceUSD * USD_TO_VND_RATE,
         credits: pack.credits,
         profileId: profile.id,
         invoiceNumber,

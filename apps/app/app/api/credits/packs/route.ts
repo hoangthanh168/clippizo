@@ -1,4 +1,4 @@
-import { getAvailablePacks } from "@repo/credits";
+import { getAvailablePacks, USD_TO_VND_RATE } from "@repo/credits";
 import { NextResponse } from "next/server";
 
 export const GET = async (): Promise<Response> => {
@@ -10,7 +10,7 @@ export const GET = async (): Promise<Response> => {
       name: pack.name,
       credits: pack.credits,
       priceUSD: pack.priceUSD,
-      priceVND: pack.priceVND,
+      priceVND: pack.priceUSD * USD_TO_VND_RATE,
       validityDays: pack.validityDays,
     })),
   });

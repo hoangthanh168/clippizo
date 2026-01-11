@@ -1,5 +1,8 @@
 "use client";
 
+import { Badge } from "@repo/design-system/components/ui/badge";
+import { Button } from "@repo/design-system/components/ui/button";
+import { Card } from "@repo/design-system/components/ui/card";
 import {
   AlertCircle,
   Calendar,
@@ -92,14 +95,16 @@ export function BillingContent() {
       currency,
     }).format(amount);
 
-  const getPlanBadgeColor = (plan: string) => {
+  const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
-      case "enterprise":
-        return "bg-purple-100 text-purple-800";
+      case "max":
+        return "default" as const;
       case "pro":
-        return "bg-blue-100 text-blue-800";
+        return "secondary" as const;
+      case "starter":
+        return "secondary" as const;
       default:
-        return "bg-gray-100 text-gray-800";
+        return "outline" as const;
     }
   };
 
@@ -126,11 +131,12 @@ export function BillingContent() {
         {subscription !== null && (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <span
-                className={`rounded-full px-3 py-1 font-medium text-sm capitalize ${getPlanBadgeColor(subscription.plan)}`}
+              <Badge
+                className="capitalize"
+                variant={getPlanBadgeVariant(subscription.plan)}
               >
                 {subscription.plan}
-              </span>
+              </Badge>
               {subscription.status !== null && (
                 <span className="text-muted-foreground text-sm capitalize">
                   {subscription.status}
@@ -174,42 +180,42 @@ export function BillingContent() {
             {/* Action buttons */}
             <div className="mt-6 flex flex-wrap gap-3">
               {subscription.plan === "free" ? (
-                <button
-                  className="rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm"
-                  onClick={() => router.push("/upgrade")}
-                  type="button"
-                >
+                <Button onClick={() => router.push("/upgrade")}>
                   Upgrade Plan
-                </button>
+                </Button>
               ) : (
                 <>
-                  <button
-                    className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm"
-                    onClick={() => router.push("/upgrade?renew=true")}
-                    type="button"
-                  >
+                  <Button onClick={() => router.push("/upgrade?renew=true")}>
                     <RefreshCw className="h-4 w-4" />
                     Renew Subscription
-                  </button>
-                  {subscription.plan === "pro" && (
-                    <button
-                      className="rounded-md border px-4 py-2 text-sm"
-                      onClick={() => router.push("/upgrade?upgrade=enterprise")}
-                      type="button"
+                  </Button>
+                  {subscription.plan === "starter" && (
+                    <Button
+                      onClick={() => router.push("/upgrade?upgrade=pro")}
+                      variant="outline"
                     >
-                      Upgrade to Enterprise
-                    </button>
+                      Upgrade to Pro
+                    </Button>
+                  )}
+                  {subscription.plan === "pro" && (
+                    <Button
+                      onClick={() => router.push("/upgrade?upgrade=max")}
+                      variant="outline"
+                    >
+                      Upgrade to Max
+                    </Button>
                   )}
                   {subscription.provider === "polar" && (
-                    <a
-                      className="flex items-center gap-2 rounded-md border px-4 py-2 text-sm hover:bg-muted"
-                      href={POLAR_CUSTOMER_PORTAL_URL}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Manage Subscription
-                    </a>
+                    <Button asChild variant="outline">
+                      <a
+                        href={POLAR_CUSTOMER_PORTAL_URL}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Manage Subscription
+                      </a>
+                    </Button>
                   )}
                 </>
               )}
@@ -230,8 +236,8 @@ export function BillingContent() {
         ) : (
           <div className="space-y-3">
             {payments.map((payment) => (
-              <div
-                className="flex items-center justify-between rounded-md border p-4"
+              <Card
+                className="flex-row items-center justify-between gap-4 p-4"
                 key={payment.id}
               >
                 <div className="flex flex-col">
@@ -241,21 +247,20 @@ export function BillingContent() {
                     {payment.provider.toUpperCase()}
                   </span>
                 </div>
-                <div className="text-right">
+                <div className="flex items-center gap-2 text-right">
                   <span className="font-medium">
                     {formatCurrency(Number(payment.amount), payment.currency)}
                   </span>
-                  <span
-                    className={`ml-2 rounded-full px-2 py-0.5 text-xs capitalize ${
-                      payment.status === "completed"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
+                  <Badge
+                    className="capitalize"
+                    variant={
+                      payment.status === "completed" ? "default" : "secondary"
+                    }
                   >
                     {payment.status}
-                  </span>
+                  </Badge>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}

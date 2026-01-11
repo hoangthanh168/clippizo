@@ -79,7 +79,6 @@ export type CreditPack = {
   name: string;
   credits: number;
   priceUSD: number;
-  priceVND: number;
   validityDays: number;
 };
 
