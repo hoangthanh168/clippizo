@@ -21,9 +21,12 @@ export const keys = () =>
       POLAR_WEBHOOK_SECRET: z.string().optional(),
       POLAR_MODE: z.enum(["sandbox", "production"]).default("sandbox"),
       // Polar product IDs (from Polar dashboard)
-      // Subscriptions
+      // Subscriptions - Monthly
       POLAR_PRODUCT_PRO: z.string().optional(),
       POLAR_PRODUCT_ENTERPRISE: z.string().optional(),
+      // Subscriptions - Yearly
+      POLAR_PRODUCT_PRO_YEARLY: z.string().optional(),
+      POLAR_PRODUCT_ENTERPRISE_YEARLY: z.string().optional(),
       // Credit packs
       POLAR_PRODUCT_PACK_STARTER: z.string().optional(),
       POLAR_PRODUCT_PACK_SMALL: z.string().optional(),
@@ -51,6 +54,8 @@ export const keys = () =>
       POLAR_MODE: process.env.POLAR_MODE,
       POLAR_PRODUCT_PRO: process.env.POLAR_PRODUCT_PRO,
       POLAR_PRODUCT_ENTERPRISE: process.env.POLAR_PRODUCT_ENTERPRISE,
+      POLAR_PRODUCT_PRO_YEARLY: process.env.POLAR_PRODUCT_PRO_YEARLY,
+      POLAR_PRODUCT_ENTERPRISE_YEARLY: process.env.POLAR_PRODUCT_ENTERPRISE_YEARLY,
       POLAR_PRODUCT_PACK_STARTER: process.env.POLAR_PRODUCT_PACK_STARTER,
       POLAR_PRODUCT_PACK_SMALL: process.env.POLAR_PRODUCT_PACK_SMALL,
       POLAR_PRODUCT_PACK_MEDIUM: process.env.POLAR_PRODUCT_PACK_MEDIUM,

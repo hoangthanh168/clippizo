@@ -5,6 +5,7 @@ import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
 import {
   activateSubscription,
+  type BillingPeriod,
   capturePayPalOrder,
   getPlan,
 } from "@repo/payments";
@@ -34,7 +35,7 @@ export const POST = async (request: Request): Promise<Response> => {
     // Capture the payment
     const captureResult = await capturePayPalOrder(orderId);
 
-    const { profileId, planId, isRenewal } = captureResult.customData;
+    const { profileId, planId, isRenewal, billingPeriod } = captureResult.customData;
 
     // Verify the profile matches the authenticated user
     const profile = await database.profile.findUnique({
@@ -107,6 +108,7 @@ export const POST = async (request: Request): Promise<Response> => {
     await activateSubscription({
       profileId,
       planId,
+      billingPeriod,
       isRenewal,
     });
 
@@ -116,6 +118,7 @@ export const POST = async (request: Request): Promise<Response> => {
       distinctId: profile.clerkUserId,
       properties: {
         plan: planId,
+        billingPeriod,
         provider: "paypal",
         amount: captureResult.amount,
         currency: captureResult.currency,

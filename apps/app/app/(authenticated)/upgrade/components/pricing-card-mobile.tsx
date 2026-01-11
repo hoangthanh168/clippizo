@@ -4,18 +4,41 @@ import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
 import { Check, Minus, Star } from "lucide-react";
 import {
+  type BillingPeriod,
   FEATURE_SECTIONS,
   formatPrice,
   getButtonLabel,
+  getCreditsDisplay,
+  getPlanPrice,
+  getYearlyTotalPrice,
   type Plan,
   type PlanId,
 } from "./pricing-data";
 
 type FeatureValueProps = {
   readonly value: string | boolean;
+  readonly billingPeriod?: BillingPeriod;
+  readonly planId?: PlanId;
+  readonly featureName?: string;
 };
 
-function FeatureValue({ value }: FeatureValueProps) {
+function FeatureValue({
+  value,
+  billingPeriod,
+  planId,
+  featureName,
+}: FeatureValueProps) {
+  // Special handling for credits display
+  if (
+    featureName === "Monthly Credits" &&
+    billingPeriod &&
+    planId &&
+    planId !== "free"
+  ) {
+    return (
+      <span className="text-sm">{getCreditsDisplay(planId, billingPeriod)}</span>
+    );
+  }
   if (typeof value === "string") {
     return <span className="text-sm">{value}</span>;
   }
@@ -26,6 +49,7 @@ function FeatureValue({ value }: FeatureValueProps) {
 }
 
 type PricingCardMobileProps = {
+  readonly billingPeriod: BillingPeriod;
   readonly plan: Plan;
   readonly currentPlan: PlanId;
   readonly onSubscribe: (planId: PlanId) => void;
@@ -33,11 +57,16 @@ type PricingCardMobileProps = {
 };
 
 export function PricingCardMobile({
+  billingPeriod,
   plan,
   currentPlan,
   onSubscribe,
   isRenewal,
 }: PricingCardMobileProps) {
+  const isYearly = billingPeriod === "yearly";
+  const monthlyPrice = plan.pricing.monthly.priceUSD;
+  const displayPrice = getPlanPrice(plan.id, billingPeriod);
+  const yearlyTotal = getYearlyTotalPrice(plan.id);
   return (
     <div
       aria-labelledby={`plan-tab-${plan.id}`}
@@ -59,12 +88,24 @@ export function PricingCardMobile({
         <h2 className="font-semibold text-xl">{plan.name}</h2>
 
         {/* Price */}
-        <div className="flex items-baseline justify-center gap-1">
-          <span className="font-bold text-4xl">
-            {formatPrice(plan.priceUSD)}
-          </span>
-          {plan.priceUSD > 0 && (
-            <span className="text-muted-foreground">/month</span>
+        <div className="flex flex-col items-center">
+          {isYearly && monthlyPrice > 0 && (
+            <span className="text-muted-foreground text-sm line-through">
+              ${monthlyPrice}/mo
+            </span>
+          )}
+          <div className="flex items-baseline justify-center gap-1">
+            <span className="font-bold text-4xl">
+              {formatPrice(displayPrice)}
+            </span>
+            {displayPrice > 0 && (
+              <span className="text-muted-foreground">/month</span>
+            )}
+          </div>
+          {isYearly && yearlyTotal > 0 && (
+            <span className="text-muted-foreground text-xs">
+              ${yearlyTotal.toFixed(2)} billed yearly
+            </span>
           )}
         </div>
 
@@ -96,7 +137,12 @@ export function PricingCardMobile({
                   key={feature}
                 >
                   <span className="text-muted-foreground">{feature}</span>
-                  <FeatureValue value={plan.features[feature]} />
+                  <FeatureValue
+                    billingPeriod={billingPeriod}
+                    featureName={feature}
+                    planId={plan.id}
+                    value={plan.features[feature]}
+                  />
                 </li>
               ))}
             </ul>

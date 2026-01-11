@@ -21,6 +21,7 @@ import { OrderSummary } from "./order-summary";
 import { PaymentMethodSelector } from "./payment-method-selector";
 
 export type PaymentProvider = "paypal" | "sepay" | "polar";
+export type BillingPeriod = "monthly" | "yearly";
 
 type CheckoutType = "subscription" | "pack";
 
@@ -28,30 +29,52 @@ const SUBSCRIPTION_PLANS = {
   pro: {
     id: "pro",
     name: "Pro",
-    priceVND: 99_000,
-    priceUSD: 9.99,
-    durationDays: 30,
-    features: [
-      "Full access to all features",
-      "Unlimited videos",
-      "RAG search",
-      "Export transcripts",
-      "500 monthly credits",
-    ],
+    pricing: {
+      monthly: { priceVND: 99_000, priceUSD: 9.99, durationDays: 30 },
+      yearly: { priceVND: 950_400, priceUSD: 95.9, durationDays: 365 },
+    },
+    features: {
+      monthly: [
+        "Full access to all features",
+        "Unlimited videos",
+        "RAG search",
+        "Export transcripts",
+        "500 monthly credits",
+      ],
+      yearly: [
+        "Full access to all features",
+        "Unlimited videos",
+        "RAG search",
+        "Export transcripts",
+        "6,000 credits upfront",
+        "Save 20%",
+      ],
+    },
   },
   enterprise: {
     id: "enterprise",
     name: "Enterprise",
-    priceVND: 299_000,
-    priceUSD: 29.99,
-    durationDays: 30,
-    features: [
-      "Everything in Pro",
-      "Priority support",
-      "API access",
-      "Custom integrations",
-      "2000 monthly credits",
-    ],
+    pricing: {
+      monthly: { priceVND: 299_000, priceUSD: 29.99, durationDays: 30 },
+      yearly: { priceVND: 2_871_360, priceUSD: 287.9, durationDays: 365 },
+    },
+    features: {
+      monthly: [
+        "Everything in Pro",
+        "Priority support",
+        "API access",
+        "Custom integrations",
+        "2,000 monthly credits",
+      ],
+      yearly: [
+        "Everything in Pro",
+        "Priority support",
+        "API access",
+        "Custom integrations",
+        "24,000 credits upfront",
+        "Save 20%",
+      ],
+    },
   },
 } as const;
 
@@ -155,6 +178,9 @@ export function CheckoutContent() {
   const type = searchParams.get("type") as CheckoutType | null;
   const id = searchParams.get("id");
   const isRenewal = searchParams.get("renew") === "true";
+  const billingParam = searchParams.get("billing");
+  const billingPeriod: BillingPeriod =
+    billingParam === "yearly" ? "yearly" : "monthly";
 
   const [provider, setProvider] = useState<PaymentProvider>("polar");
   const [loading, setLoading] = useState(false);
@@ -181,12 +207,30 @@ export function CheckoutContent() {
   const getProduct = () => {
     if (type === "subscription") {
       if (isValidPlanId(id)) {
-        return { type: "subscription" as const, data: SUBSCRIPTION_PLANS[id] };
+        const plan = SUBSCRIPTION_PLANS[id];
+        const pricing = plan.pricing[billingPeriod];
+        const features = plan.features[billingPeriod];
+        return {
+          type: "subscription" as const,
+          data: {
+            id: plan.id,
+            name: plan.name,
+            priceVND: pricing.priceVND,
+            priceUSD: pricing.priceUSD,
+            durationDays: pricing.durationDays,
+            features,
+          },
+          billingPeriod,
+        };
       }
       return null;
     }
     if (isValidPackId(id)) {
-      return { type: "pack" as const, data: CREDIT_PACKS[id] };
+      return {
+        type: "pack" as const,
+        data: CREDIT_PACKS[id],
+        billingPeriod: "monthly" as BillingPeriod,
+      };
     }
     return null;
   };
@@ -226,7 +270,7 @@ export function CheckoutContent() {
         } else {
           endpoint = "/api/checkout/sepay";
         }
-        body = { plan: id, isRenewal };
+        body = { plan: id, billingPeriod, isRenewal };
       } else {
         endpoint = "/api/credits/packs/purchase";
         body = { packId: id, provider };

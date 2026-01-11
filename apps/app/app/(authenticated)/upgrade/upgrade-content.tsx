@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { BillingToggle } from "./components/billing-toggle";
 import { CreditStatus } from "./components/credit-status";
 import { FAQSection } from "./components/faq-section";
+import type { BillingPeriod } from "./components/pricing-data";
 import { PricingTable } from "./components/pricing-table";
 
 type PlanId = "free" | "pro" | "enterprise";
@@ -29,6 +30,7 @@ export function UpgradeContent() {
   );
   const [credits, setCredits] = useState<CreditBalance | null>(null);
   const [loading, setLoading] = useState(true);
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("monthly");
 
   useEffect(() => {
     async function fetchData() {
@@ -66,6 +68,7 @@ export function UpgradeContent() {
     const params = new URLSearchParams({
       type: "subscription",
       id: planId,
+      billing: billingPeriod,
     });
     if (isRenewal) {
       params.set("renew", "true");
@@ -85,10 +88,14 @@ export function UpgradeContent() {
     <div className="w-full space-y-8 pb-20 md:pb-0">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <CreditStatus credits={credits} subscription={subscription} />
-        <BillingToggle />
+        <BillingToggle
+          billingPeriod={billingPeriod}
+          onBillingPeriodChange={setBillingPeriod}
+        />
       </div>
 
       <PricingTable
+        billingPeriod={billingPeriod}
         currentPlan={subscription?.plan ?? "free"}
         isRenewal={isRenewal}
         onSubscribe={handleSubscribe}

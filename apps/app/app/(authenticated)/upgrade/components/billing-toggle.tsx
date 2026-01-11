@@ -4,32 +4,50 @@ import { Badge } from "@repo/design-system/components/ui/badge";
 import { Label } from "@repo/design-system/components/ui/label";
 import { Switch } from "@repo/design-system/components/ui/switch";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { BillingPeriod } from "./pricing-data";
 
 type BillingToggleProps = {
+  readonly billingPeriod: BillingPeriod;
+  readonly onBillingPeriodChange: (period: BillingPeriod) => void;
   readonly onScrollLeft?: () => void;
   readonly onScrollRight?: () => void;
   readonly showNavArrows?: boolean;
 };
 
 export function BillingToggle({
+  billingPeriod,
+  onBillingPeriodChange,
   onScrollLeft,
   onScrollRight,
   showNavArrows = false,
 }: BillingToggleProps) {
+  const isYearly = billingPeriod === "yearly";
+
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2">
-        <Label className="text-sm" htmlFor="billing-toggle">
+        <Label
+          className={`text-sm ${!isYearly ? "font-medium" : "text-muted-foreground"}`}
+          htmlFor="billing-toggle"
+        >
           Monthly
         </Label>
-        <Switch disabled id="billing-toggle" />
+        <Switch
+          checked={isYearly}
+          id="billing-toggle"
+          onCheckedChange={(checked) =>
+            onBillingPeriodChange(checked ? "yearly" : "monthly")
+          }
+        />
         <Label
-          className="text-muted-foreground text-sm"
+          className={`text-sm ${isYearly ? "font-medium" : "text-muted-foreground"}`}
           htmlFor="billing-toggle"
         >
           Yearly
         </Label>
-        <Badge variant="secondary">Coming soon</Badge>
+        <Badge className="bg-green-600 text-white hover:bg-green-700">
+          Save 20%
+        </Badge>
       </div>
 
       {showNavArrows === true && (

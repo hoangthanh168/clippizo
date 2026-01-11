@@ -8,6 +8,7 @@ import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
 import {
   activateSubscription,
+  type BillingPeriod,
   getPlan,
   parseSePayCustomData,
   parseSePayPackCustomData,
@@ -75,7 +76,7 @@ export const POST = async (request: Request): Promise<Response> => {
       );
     }
 
-    const { profileId, planId, isRenewal } = customData;
+    const { profileId, planId, isRenewal, billingPeriod } = customData;
 
     // Check for idempotency - has this transaction already been processed?
     const existingPayment = await database.payment.findUnique({
@@ -129,14 +130,16 @@ export const POST = async (request: Request): Promise<Response> => {
     const subscriptionResult = await activateSubscription({
       profileId,
       planId,
+      billingPeriod,
       isRenewal,
     });
 
-    // Allocate monthly credits
+    // Allocate credits based on billing period
     const creditAllocation = await allocateCreditsOnSubscriptionActivation(
       profileId,
       planId,
-      subscriptionResult.expiresAt
+      subscriptionResult.expiresAt,
+      billingPeriod
     );
 
     log.info("Credits allocated", {
@@ -157,6 +160,7 @@ export const POST = async (request: Request): Promise<Response> => {
         distinctId: profile.clerkUserId,
         properties: {
           plan: planId,
+          billingPeriod,
           provider: "sepay",
           amount: order.order_amount,
           currency: "VND",

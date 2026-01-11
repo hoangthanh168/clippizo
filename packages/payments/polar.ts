@@ -2,7 +2,7 @@ import "server-only";
 import { Polar } from "@polar-sh/sdk";
 import { validateEvent } from "@polar-sh/sdk/webhooks";
 import { keys } from "./keys";
-import type { PlanId } from "./plans";
+import type { BillingPeriod, PlanId } from "./plans";
 
 // biome-ignore lint/performance/noBarrelFile: required for package exports
 export { WebhookVerificationError } from "@polar-sh/sdk/webhooks";
@@ -119,18 +119,29 @@ function getPolarClient(): Polar {
 // Product ID Mapping
 // ===========================================
 
-function getPolarProductId(planId: PlanId): string {
+function getPolarProductId(
+  planId: PlanId,
+  billingPeriod: BillingPeriod = "monthly"
+): string {
   const env = keys();
 
-  const productMap: Record<PlanId, string | undefined> = {
-    free: undefined,
-    pro: env.POLAR_PRODUCT_PRO,
-    enterprise: env.POLAR_PRODUCT_ENTERPRISE,
+  const productMap: Record<PlanId, Record<BillingPeriod, string | undefined>> = {
+    free: { monthly: undefined, yearly: undefined },
+    pro: {
+      monthly: env.POLAR_PRODUCT_PRO,
+      yearly: env.POLAR_PRODUCT_PRO_YEARLY,
+    },
+    enterprise: {
+      monthly: env.POLAR_PRODUCT_ENTERPRISE,
+      yearly: env.POLAR_PRODUCT_ENTERPRISE_YEARLY,
+    },
   };
 
-  const productId = productMap[planId];
+  const productId = productMap[planId][billingPeriod];
   if (!productId) {
-    throw new Error(`Polar product ID not configured for plan: ${planId}`);
+    throw new Error(
+      `Polar product ID not configured for plan: ${planId} (${billingPeriod})`
+    );
   }
 
   return productId;
@@ -156,17 +167,33 @@ function getPolarPackProductId(packId: CreditPackId): string {
   return productId;
 }
 
+export type PlanFromProductResult = {
+  planId: PlanId;
+  billingPeriod: BillingPeriod;
+};
+
 /**
- * Get plan ID from Polar product ID (reverse mapping)
+ * Get plan ID and billing period from Polar product ID (reverse mapping)
  */
-export function getPlanIdFromPolarProduct(productId: string): PlanId | null {
+export function getPlanIdFromPolarProduct(
+  productId: string
+): PlanFromProductResult | null {
   const env = keys();
 
+  // Monthly products
   if (productId === env.POLAR_PRODUCT_PRO) {
-    return "pro";
+    return { planId: "pro", billingPeriod: "monthly" };
   }
   if (productId === env.POLAR_PRODUCT_ENTERPRISE) {
-    return "enterprise";
+    return { planId: "enterprise", billingPeriod: "monthly" };
+  }
+
+  // Yearly products
+  if (productId === env.POLAR_PRODUCT_PRO_YEARLY) {
+    return { planId: "pro", billingPeriod: "yearly" };
+  }
+  if (productId === env.POLAR_PRODUCT_ENTERPRISE_YEARLY) {
+    return { planId: "enterprise", billingPeriod: "yearly" };
   }
 
   return null;
@@ -208,6 +235,7 @@ export function getPackIdFromPolarProduct(
 
 export type CreatePolarCheckoutParams = {
   planId: PlanId;
+  billingPeriod: BillingPeriod;
   profileId: string;
   successUrl: string;
 };
@@ -223,10 +251,10 @@ export type CreatePolarCheckoutResult = {
 export async function createPolarCheckout(
   params: CreatePolarCheckoutParams
 ): Promise<CreatePolarCheckoutResult> {
-  const { planId, profileId, successUrl } = params;
+  const { planId, billingPeriod, profileId, successUrl } = params;
 
   const polar = getPolarClient();
-  const productId = getPolarProductId(planId);
+  const productId = getPolarProductId(planId, billingPeriod);
 
   const checkout = await polar.checkouts.create({
     products: [productId],

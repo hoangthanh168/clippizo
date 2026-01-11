@@ -2,7 +2,12 @@ import { auth } from "@repo/auth/server";
 import { database } from "@repo/database";
 import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
-import { createPolarCheckout, isPaidPlan, type PlanId } from "@repo/payments";
+import {
+  type BillingPeriod,
+  createPolarCheckout,
+  isPaidPlan,
+  type PlanId,
+} from "@repo/payments";
 import { NextResponse } from "next/server";
 
 export const POST = async (request: Request): Promise<Response> => {
@@ -17,9 +22,18 @@ export const POST = async (request: Request): Promise<Response> => {
     }
 
     const body = await request.json();
-    const { plan } = body as {
+    const { plan, billingPeriod = "monthly" } = body as {
       plan: string;
+      billingPeriod?: BillingPeriod;
     };
+
+    // Validate billing period
+    if (billingPeriod !== "monthly" && billingPeriod !== "yearly") {
+      return NextResponse.json(
+        { message: "Invalid billing period", ok: false },
+        { status: 400 }
+      );
+    }
 
     if (!(plan && isPaidPlan(plan))) {
       return NextResponse.json(
@@ -43,6 +57,7 @@ export const POST = async (request: Request): Promise<Response> => {
 
     const result = await createPolarCheckout({
       planId: plan as PlanId,
+      billingPeriod,
       profileId: profile.id,
       successUrl: `${baseUrl}/checkout/polar/success`,
     });
@@ -50,6 +65,7 @@ export const POST = async (request: Request): Promise<Response> => {
     log.info("Polar checkout created", {
       profileId: profile.id,
       plan,
+      billingPeriod,
       checkoutId: result.checkoutId,
     });
 

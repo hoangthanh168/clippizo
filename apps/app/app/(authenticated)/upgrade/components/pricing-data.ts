@@ -1,12 +1,22 @@
 export type PlanId = "free" | "pro" | "enterprise";
+export type BillingPeriod = "monthly" | "yearly";
+
+export type PlanPricing = {
+  monthly: { priceUSD: number };
+  yearly: { priceUSD: number; monthlyEquivalent: number; discount: number };
+};
 
 export type Plan = {
   id: PlanId;
   name: string;
   description: string;
-  priceUSD: number;
+  pricing: PlanPricing;
   popular?: boolean;
   features: Record<string, string | boolean>;
+  credits: {
+    monthly: number;
+    yearly: number;
+  };
 };
 
 export const PLANS: Record<PlanId, Plan> = {
@@ -14,7 +24,11 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "free",
     name: "Free",
     description: "Get started with basic features to explore the platform.",
-    priceUSD: 0,
+    pricing: {
+      monthly: { priceUSD: 0 },
+      yearly: { priceUSD: 0, monthlyEquivalent: 0, discount: 0 },
+    },
+    credits: { monthly: 50, yearly: 0 },
     features: {
       "Monthly Credits": "50 credits",
       "Additional Credits": false,
@@ -30,7 +44,11 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "pro",
     name: "Pro",
     description: "Perfect for creators who need full access to AI video tools.",
-    priceUSD: 9.99,
+    pricing: {
+      monthly: { priceUSD: 9.99 },
+      yearly: { priceUSD: 95.9, monthlyEquivalent: 7.99, discount: 0.2 },
+    },
+    credits: { monthly: 500, yearly: 6000 },
     popular: true,
     features: {
       "Monthly Credits": "500 credits",
@@ -47,7 +65,11 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "enterprise",
     name: "Enterprise",
     description: "For teams and businesses with advanced needs and support.",
-    priceUSD: 29.99,
+    pricing: {
+      monthly: { priceUSD: 29.99 },
+      yearly: { priceUSD: 287.9, monthlyEquivalent: 23.99, discount: 0.2 },
+    },
+    credits: { monthly: 2000, yearly: 24000 },
     features: {
       "Monthly Credits": "2000 credits",
       "Additional Credits": "Purchase packs",
@@ -91,6 +113,32 @@ export const formatPrice = (price: number): string => {
     style: "currency",
     currency: "USD",
   }).format(price);
+};
+
+export const getPlanPrice = (
+  planId: PlanId,
+  billingPeriod: BillingPeriod
+): number => {
+  const plan = PLANS[planId];
+  return billingPeriod === "yearly"
+    ? plan.pricing.yearly.monthlyEquivalent
+    : plan.pricing.monthly.priceUSD;
+};
+
+export const getYearlyTotalPrice = (planId: PlanId): number => {
+  return PLANS[planId].pricing.yearly.priceUSD;
+};
+
+export const getCreditsDisplay = (
+  planId: PlanId,
+  billingPeriod: BillingPeriod
+): string => {
+  const plan = PLANS[planId];
+  if (planId === "free") return "50 credits";
+
+  const credits =
+    billingPeriod === "yearly" ? plan.credits.yearly : plan.credits.monthly;
+  return `${credits.toLocaleString()} credits`;
 };
 
 export const getButtonLabel = (

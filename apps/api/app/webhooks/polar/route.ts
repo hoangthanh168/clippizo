@@ -8,6 +8,7 @@ import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
 import {
   activateSubscription,
+  type BillingPeriod,
   cancelSubscription,
   getPackIdFromPolarProduct,
   getPlan,
@@ -156,9 +157,9 @@ async function handleOrderPaid(order: PolarOrder): Promise<Response> {
   }
 
   // Subscription payment (initial or renewal)
-  const planId = getPlanIdFromPolarProduct(order.product_id);
+  const planResult = getPlanIdFromPolarProduct(order.product_id);
 
-  if (!planId) {
+  if (!planResult) {
     log.error("Polar webhook: unknown subscription product", {
       productId: order.product_id,
     });
@@ -168,12 +169,14 @@ async function handleOrderPaid(order: PolarOrder): Promise<Response> {
     );
   }
 
+  const { planId, billingPeriod } = planResult;
   const isRenewal = isSubscriptionRenewal(order);
   const isInitial = isSubscriptionCreate(order);
 
   return handleSubscriptionPayment({
     profileId,
     planId,
+    billingPeriod,
     orderId,
     amount: order.total_amount,
     currency: order.currency,
@@ -190,6 +193,7 @@ async function handleOrderPaid(order: PolarOrder): Promise<Response> {
 async function handleSubscriptionPayment(params: {
   profileId: string;
   planId: PlanId;
+  billingPeriod: BillingPeriod;
   orderId: string;
   amount: number;
   currency: string;
@@ -201,6 +205,7 @@ async function handleSubscriptionPayment(params: {
   const {
     profileId,
     planId,
+    billingPeriod,
     orderId,
     amount,
     currency,
@@ -236,6 +241,7 @@ async function handleSubscriptionPayment(params: {
       packId: null,
       metadata: {
         isRenewal,
+        billingPeriod,
         polarSubscriptionId: subscriptionId,
       },
     },
@@ -245,14 +251,16 @@ async function handleSubscriptionPayment(params: {
   const subscriptionResult = await activateSubscription({
     profileId,
     planId,
+    billingPeriod,
     isRenewal,
   });
 
-  // Allocate monthly credits
+  // Allocate credits based on billing period
   const creditAllocation = await allocateCreditsOnSubscriptionActivation(
     profileId,
     planId,
-    subscriptionResult.expiresAt
+    subscriptionResult.expiresAt,
+    billingPeriod
   );
 
   log.info("Polar credits allocated", {
@@ -273,6 +281,7 @@ async function handleSubscriptionPayment(params: {
       distinctId: profile.clerkUserId,
       properties: {
         plan: planId,
+        billingPeriod,
         provider: "polar",
         amount: amountInDollars,
         currency: currency.toUpperCase(),
@@ -288,6 +297,7 @@ async function handleSubscriptionPayment(params: {
   log.info("Polar subscription payment processed", {
     profileId,
     planId,
+    billingPeriod,
     orderId,
     isRenewal,
   });

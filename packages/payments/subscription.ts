@@ -1,6 +1,12 @@
 import "server-only";
 import { database } from "@repo/database";
-import { isPaidPlan, PLANS, type PlanId } from "./plans";
+import {
+  getPlanDuration,
+  isPaidPlan,
+  PLANS,
+  type BillingPeriod,
+  type PlanId,
+} from "./plans";
 
 export type SubscriptionStatus = "active" | "expired" | "cancelled" | null;
 export type PaymentProvider = "paypal" | "sepay" | "polar" | null;
@@ -92,25 +98,27 @@ export async function getSubscriptionInfo(
 export interface ActivateSubscriptionParams {
   profileId: string;
   planId: PlanId;
+  billingPeriod: BillingPeriod;
   isRenewal?: boolean;
 }
 
 export interface ActivateSubscriptionResult {
   expiresAt: Date;
   planId: PlanId;
+  billingPeriod: BillingPeriod;
   isRenewal: boolean;
 }
 
 export async function activateSubscription(
   params: ActivateSubscriptionParams
 ): Promise<ActivateSubscriptionResult> {
-  const { profileId, planId, isRenewal = false } = params;
+  const { profileId, planId, billingPeriod, isRenewal = false } = params;
 
   if (!isPaidPlan(planId)) {
     throw new Error("Cannot activate free plan");
   }
 
-  const plan = PLANS[planId];
+  const durationDays = getPlanDuration(planId, billingPeriod);
   const now = new Date();
 
   // Get current subscription to calculate new expiry
@@ -126,11 +134,11 @@ export async function activateSubscription(
     const currentExpiry = profile.subscriptionExpiresAt;
     const baseDate = currentExpiry > now ? currentExpiry : now;
     newExpiresAt = new Date(baseDate);
-    newExpiresAt.setDate(newExpiresAt.getDate() + plan.durationDays);
+    newExpiresAt.setDate(newExpiresAt.getDate() + durationDays);
   } else {
     // New subscription: start from now
     newExpiresAt = new Date(now);
-    newExpiresAt.setDate(newExpiresAt.getDate() + plan.durationDays);
+    newExpiresAt.setDate(newExpiresAt.getDate() + durationDays);
   }
 
   await database.profile.update({
@@ -145,6 +153,7 @@ export async function activateSubscription(
   return {
     expiresAt: newExpiresAt,
     planId,
+    billingPeriod,
     isRenewal,
   };
 }

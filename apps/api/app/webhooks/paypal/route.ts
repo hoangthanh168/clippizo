@@ -8,6 +8,7 @@ import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
 import {
   activateSubscription,
+  type BillingPeriod,
   extractPayPalWebhookHeaders,
   getPayPalOrder,
   getPlan,
@@ -108,6 +109,7 @@ export const POST = async (request: Request): Promise<Response> => {
       planId?: PlanId;
       packId?: string;
       isRenewal?: boolean;
+      billingPeriod?: BillingPeriod;
     };
 
     try {
@@ -144,7 +146,7 @@ export const POST = async (request: Request): Promise<Response> => {
     }
 
     // Handle subscription payment
-    const { planId, isRenewal } = customData;
+    const { planId, isRenewal, billingPeriod = "monthly" } = customData;
 
     if (!planId) {
       log.error("PayPal webhook: missing planId for subscription", { orderId });
@@ -218,14 +220,16 @@ export const POST = async (request: Request): Promise<Response> => {
     const subscriptionResult = await activateSubscription({
       profileId,
       planId,
+      billingPeriod,
       isRenewal,
     });
 
-    // Allocate monthly credits
+    // Allocate credits based on billing period
     const creditAllocation = await allocateCreditsOnSubscriptionActivation(
       profileId,
       planId,
-      subscriptionResult.expiresAt
+      subscriptionResult.expiresAt,
+      billingPeriod
     );
 
     log.info("Credits allocated", {
@@ -246,6 +250,7 @@ export const POST = async (request: Request): Promise<Response> => {
         distinctId: profile.clerkUserId,
         properties: {
           plan: planId,
+          billingPeriod,
           provider: "paypal",
           amount,
           currency,

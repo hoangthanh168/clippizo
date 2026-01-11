@@ -36,7 +36,6 @@ vi.mock("@repo/payments", () => ({
       {
         id: string;
         name: string;
-        durationDays: number;
         monthlyCredits: number;
         rolloverCapMultiplier: number;
       }
@@ -44,26 +43,26 @@ vi.mock("@repo/payments", () => ({
       free: {
         id: "free",
         name: "Free",
-        durationDays: 30,
         monthlyCredits: 50,
         rolloverCapMultiplier: 1,
       },
       pro: {
         id: "pro",
         name: "Pro",
-        durationDays: 30,
         monthlyCredits: 500,
         rolloverCapMultiplier: 2,
       },
       enterprise: {
         id: "enterprise",
         name: "Enterprise",
-        durationDays: 30,
         monthlyCredits: 2000,
         rolloverCapMultiplier: 2,
       },
     };
     return plans[planId];
+  }),
+  getPlanDuration: vi.fn((_planId: string, billingPeriod: string) => {
+    return billingPeriod === "yearly" ? 365 : 30;
   }),
   getPlanRolloverCap: vi.fn((planId: string) => {
     const caps: Record<string, number> = {

@@ -24,9 +24,12 @@ export {
 } from "./paypal";
 // Plans configuration
 export {
+  type BillingPeriod,
   getPlan,
+  getPlanDuration,
   getPlanPrice,
   getPlanRolloverCap,
+  getYearlyCredits,
   isPaidPlan,
   PLANS,
   type PlanId,
@@ -50,6 +53,7 @@ export {
   isSubscriptionCreate,
   isSubscriptionRenewal,
   isSubscriptionRevokedEvent,
+  type PlanFromProductResult,
   type PolarBillingReason,
   type PolarCustomer,
   type PolarOrder,
@@ -82,6 +86,7 @@ export {
 // Subscription management
 export {
   type ActivateSubscriptionParams,
+  type ActivateSubscriptionResult,
   activateSubscription,
   canCreateContent,
   cancelSubscription,

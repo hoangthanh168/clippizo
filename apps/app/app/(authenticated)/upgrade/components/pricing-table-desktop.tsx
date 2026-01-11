@@ -5,9 +5,13 @@ import { Button } from "@repo/design-system/components/ui/button";
 import { Check, Minus, Star } from "lucide-react";
 import { Fragment } from "react";
 import {
+  type BillingPeriod,
   FEATURE_SECTIONS,
   formatPrice,
   getButtonLabel,
+  getCreditsDisplay,
+  getPlanPrice,
+  getYearlyTotalPrice,
   PLAN_ORDER,
   PLANS,
   type Plan,
@@ -16,9 +20,28 @@ import {
 
 type FeatureValueProps = {
   readonly value: string | boolean;
+  readonly billingPeriod?: BillingPeriod;
+  readonly planId?: PlanId;
+  readonly featureName?: string;
 };
 
-function FeatureValue({ value }: FeatureValueProps) {
+function FeatureValue({
+  value,
+  billingPeriod,
+  planId,
+  featureName,
+}: FeatureValueProps) {
+  // Special handling for credits display
+  if (
+    featureName === "Monthly Credits" &&
+    billingPeriod &&
+    planId &&
+    planId !== "free"
+  ) {
+    return (
+      <span className="text-sm">{getCreditsDisplay(planId, billingPeriod)}</span>
+    );
+  }
   if (typeof value === "string") {
     return <span className="text-sm">{value}</span>;
   }
@@ -29,17 +52,20 @@ function FeatureValue({ value }: FeatureValueProps) {
 }
 
 type PricingTableDesktopProps = {
+  readonly billingPeriod: BillingPeriod;
   readonly currentPlan: PlanId;
   readonly onSubscribe: (planId: PlanId) => void;
   readonly isRenewal: boolean;
 };
 
 export function PricingTableDesktop({
+  billingPeriod,
   currentPlan,
   onSubscribe,
   isRenewal,
 }: PricingTableDesktopProps) {
   const plans: Plan[] = PLAN_ORDER.map((id) => PLANS[id]);
+  const isYearly = billingPeriod === "yearly";
 
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
@@ -81,23 +107,41 @@ export function PricingTableDesktop({
             {/* Row 3: Price */}
             <tr>
               <th className="sticky left-0 z-20 bg-card" />
-              {plans.map((plan) => (
-                <th
-                  className="border-l px-4 py-2 text-center"
-                  key={`price-${plan.id}`}
-                >
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="font-bold text-3xl">
-                      {formatPrice(plan.priceUSD)}
-                    </span>
-                    {plan.priceUSD > 0 && (
-                      <span className="text-muted-foreground text-sm">
-                        /month
-                      </span>
-                    )}
-                  </div>
-                </th>
-              ))}
+              {plans.map((plan) => {
+                const monthlyPrice = plan.pricing.monthly.priceUSD;
+                const displayPrice = getPlanPrice(plan.id, billingPeriod);
+                const yearlyTotal = getYearlyTotalPrice(plan.id);
+
+                return (
+                  <th
+                    className="border-l px-4 py-2 text-center"
+                    key={`price-${plan.id}`}
+                  >
+                    <div className="flex flex-col items-center">
+                      {isYearly && monthlyPrice > 0 && (
+                        <span className="text-muted-foreground text-sm line-through">
+                          ${monthlyPrice}/mo
+                        </span>
+                      )}
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="font-bold text-3xl">
+                          {formatPrice(displayPrice)}
+                        </span>
+                        {displayPrice > 0 && (
+                          <span className="text-muted-foreground text-sm">
+                            /month
+                          </span>
+                        )}
+                      </div>
+                      {isYearly && yearlyTotal > 0 && (
+                        <span className="text-muted-foreground text-xs">
+                          ${yearlyTotal.toFixed(2)} billed yearly
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                );
+              })}
             </tr>
 
             {/* Row 4: Description */}
@@ -159,7 +203,12 @@ export function PricingTableDesktop({
                         className="border-l px-4 py-3 text-center"
                         key={`${plan.id}-${feature}`}
                       >
-                        <FeatureValue value={plan.features[feature]} />
+                        <FeatureValue
+                          billingPeriod={billingPeriod}
+                          featureName={feature}
+                          planId={plan.id}
+                          value={plan.features[feature]}
+                        />
                       </td>
                     ))}
                   </tr>

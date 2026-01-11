@@ -1,7 +1,7 @@
 import "server-only";
 import { SePayPgClient } from "sepay-pg-node";
 import { keys } from "./keys";
-import { getPlanPrice, type PlanId } from "./plans";
+import { type BillingPeriod, getPlanPrice, type PlanId } from "./plans";
 
 function getClient(): SePayPgClient {
   const env = keys();
@@ -132,6 +132,7 @@ export interface ParsedCustomData {
   profileId: string;
   planId: PlanId;
   isRenewal: boolean;
+  billingPeriod: BillingPeriod;
 }
 
 export function parseSePayCustomData(
@@ -145,6 +146,7 @@ export function parseSePayCustomData(
       profileId: String(customData.profileId ?? ""),
       planId: (customData.planId as PlanId) ?? "pro",
       isRenewal: Boolean(customData.isRenewal),
+      billingPeriod: (customData.billingPeriod as BillingPeriod) ?? "monthly",
     };
   }
 
@@ -155,6 +157,7 @@ export function parseSePayCustomData(
       profileId: parsed.profileId ?? "",
       planId: parsed.planId ?? "pro",
       isRenewal: parsed.isRenewal ?? false,
+      billingPeriod: parsed.billingPeriod ?? "monthly",
     };
   } catch {
     return null;

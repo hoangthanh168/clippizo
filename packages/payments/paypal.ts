@@ -11,7 +11,7 @@ import {
   OrdersController,
 } from "@paypal/paypal-server-sdk";
 import { keys } from "./keys";
-import { getPlanPrice, type PlanId } from "./plans";
+import { type BillingPeriod, getPlanPrice, type PlanId } from "./plans";
 
 let client: Client | null = null;
 
@@ -113,6 +113,7 @@ export interface CaptureOrderResult {
     profileId: string;
     planId: PlanId;
     isRenewal: boolean;
+    billingPeriod: BillingPeriod;
   };
 }
 
@@ -133,9 +134,13 @@ export async function capturePayPalOrder(
     throw new Error("Failed to capture PayPal payment");
   }
 
-  const customData = customId
-    ? JSON.parse(customId)
-    : { profileId: "", planId: "pro", isRenewal: false };
+  const parsed = customId ? JSON.parse(customId) : {};
+  const customData = {
+    profileId: parsed.profileId ?? "",
+    planId: parsed.planId ?? "pro",
+    isRenewal: parsed.isRenewal ?? false,
+    billingPeriod: (parsed.billingPeriod as BillingPeriod) ?? "monthly",
+  };
 
   return {
     transactionId: capture.id,
