@@ -47,11 +47,11 @@ export function ExpiringCreditsWarning({
         <span>Credits Expiring Soon</span>
         {dismissible && (
           <Button
-            variant="ghost"
-            size="icon-sm"
+            aria-label="Dismiss"
             className="h-6 w-6 text-orange-600 hover:bg-orange-100 hover:text-orange-800 dark:text-orange-400 dark:hover:bg-orange-900 dark:hover:text-orange-200"
             onClick={() => setDismissed(true)}
-            aria-label="Dismiss"
+            size="icon-sm"
+            variant="ghost"
           >
             <X className="h-4 w-4" />
           </Button>

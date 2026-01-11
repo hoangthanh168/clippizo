@@ -15,9 +15,9 @@ export {
   capturePayPalPackOrder,
   createPayPalOrder,
   createPayPalPackOrder,
-  getPayPalOrder,
   // Webhook verification
   extractPayPalWebhookHeaders,
+  getPayPalOrder,
   verifyPayPalWebhook,
   type WebhookVerificationParams,
   type WebhookVerificationResult,

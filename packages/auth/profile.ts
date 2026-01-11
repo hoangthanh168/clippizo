@@ -1,8 +1,8 @@
 import "server-only";
 
 import { clerkClient } from "@clerk/nextjs/server";
-import { database } from "@repo/database";
 import type { Profile } from "@repo/database";
+import { database } from "@repo/database";
 
 /**
  * Get profile by Clerk user ID, or create one on-demand if webhook failed.

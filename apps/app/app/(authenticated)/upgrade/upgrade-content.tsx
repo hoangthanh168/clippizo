@@ -1,82 +1,68 @@
 "use client";
 
-import { Button } from "@repo/design-system/components/ui/button";
-import { Check } from "lucide-react";
+import type { CreditBalance } from "@repo/credits";
+import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { BillingToggle } from "./components/billing-toggle";
+import { CreditStatus } from "./components/credit-status";
+import { FAQSection } from "./components/faq-section";
+import { PricingTable } from "./components/pricing-table";
 
-const PLANS = {
-  free: {
-    id: "free",
-    name: "Free",
-    priceVND: 0,
-    priceUSD: 0,
-    features: ["Read-only access", "View transcripts", "Basic search"],
-  },
-  pro: {
-    id: "pro",
-    name: "Pro",
-    priceVND: 99_000,
-    priceUSD: 9.99,
-    features: [
-      "Full access",
-      "Unlimited videos",
-      "RAG search",
-      "Export transcripts",
-      "30-day subscription",
-    ],
-  },
-  enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
-    priceVND: 299_000,
-    priceUSD: 29.99,
-    features: [
-      "Everything in Pro",
-      "Priority support",
-      "API access",
-      "Custom integrations",
-      "30-day subscription",
-    ],
-  },
-} as const;
+type PlanId = "free" | "pro" | "enterprise";
 
-type PlanId = keyof typeof PLANS;
+type SubscriptionInfo = {
+  plan: PlanId;
+  status: string | null;
+  expiresAt: string | null;
+  isActive: boolean;
+  daysRemaining: number | null;
+};
 
 export function UpgradeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const isRenewal = searchParams.get("renew") === "true";
-  const planFromWeb = searchParams.get("plan");
-  const upgradeTarget = searchParams.get("upgrade");
-  const targetPlan = planFromWeb || upgradeTarget;
 
-  const formatPrice = (plan: (typeof PLANS)[PlanId]) => {
-    const vnd = new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(plan.priceVND);
-    const usd = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(plan.priceUSD);
-    return { vnd, usd };
-  };
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(
+    null
+  );
+  const [credits, setCredits] = useState<CreditBalance | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const filteredPlans = targetPlan
-    ? Object.values(PLANS).filter((p) => p.id === targetPlan)
-    : Object.values(PLANS);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [subRes, creditsRes] = await Promise.all([
+          fetch("/api/subscription"),
+          fetch("/api/credits/balance"),
+        ]);
 
-  const getGridClassName = () => {
-    if (filteredPlans.length === 1) {
-      return "mx-auto max-w-md";
+        if (subRes.ok) {
+          const subData = await subRes.json();
+          setSubscription(subData.subscription);
+        }
+
+        if (creditsRes.ok) {
+          const creditsData = await creditsRes.json();
+          setCredits(creditsData.balance);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-    if (filteredPlans.length === 2) {
-      return "mx-auto max-w-3xl md:grid-cols-2";
-    }
-    return "md:grid-cols-3";
-  };
 
-  const handleGetStarted = (planId: PlanId) => {
+    fetchData();
+  }, []);
+
+  const handleSubscribe = (planId: PlanId) => {
+    if (planId === "free") {
+      router.push("/");
+      return;
+    }
+
     const params = new URLSearchParams({
       type: "subscription",
       id: planId,
@@ -87,82 +73,30 @@ export function UpgradeContent() {
     router.push(`/checkout?${params.toString()}`);
   };
 
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-6xl">
-      <div className="mb-12 text-center">
-        <h1 className="mb-4 font-bold text-4xl">
-          {isRenewal ? "Renew Your Subscription" : "Choose Your Plan"}
-        </h1>
-        <p className="mx-auto max-w-2xl text-muted-foreground">
-          {isRenewal
-            ? "Extend your subscription to continue enjoying full access to all features."
-            : "Select the plan that best fits your needs. All paid plans include a 30-day subscription period."}
-        </p>
+    <div className="w-full space-y-8">
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <CreditStatus credits={credits} subscription={subscription} />
+        <BillingToggle />
       </div>
 
-      <div className={`grid gap-8 ${getGridClassName()}`}>
-        {filteredPlans.map((plan) => {
-          const prices = formatPrice(plan);
-          return (
-            <div
-              className={`flex flex-col rounded-xl border p-6 ${
-                plan.id === "pro" ? "border-primary shadow-lg" : ""
-              }`}
-              key={plan.id}
-            >
-              {plan.id === "pro" && (
-                <span className="mb-4 self-start rounded-full bg-primary px-3 py-1 text-primary-foreground text-xs">
-                  Most Popular
-                </span>
-              )}
+      <PricingTable
+        currentPlan={subscription?.plan ?? "free"}
+        isRenewal={isRenewal}
+        onSubscribe={handleSubscribe}
+      />
 
-              <h2 className="mb-2 font-bold text-2xl">{plan.name}</h2>
+      <FAQSection />
 
-              <div className="mb-6">
-                {plan.id === "free" ? (
-                  <span className="font-bold text-4xl">{prices.usd}</span>
-                ) : (
-                  <>
-                    <span className="font-bold text-4xl">{prices.usd}</span>
-                    <span className="text-muted-foreground">/month</span>
-                    <p className="mt-1 text-muted-foreground text-sm">
-                      ~{prices.vnd}
-                    </p>
-                  </>
-                )}
-              </div>
-
-              <ul className="mb-8 flex-1 space-y-3">
-                {plan.features.map((feature) => (
-                  <li className="flex items-center gap-2" key={feature}>
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span className="text-sm">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {plan.id === "free" ? (
-                <Button
-                  className="w-full"
-                  onClick={() => router.push("/")}
-                  variant="outline"
-                >
-                  Current Plan
-                </Button>
-              ) : (
-                <Button
-                  className="w-full"
-                  onClick={() => handleGetStarted(plan.id)}
-                >
-                  {isRenewal ? "Renew Now" : "Get Started"}
-                </Button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="mt-12 text-center text-muted-foreground text-sm">
+      <div className="text-center text-muted-foreground text-sm">
         <p>
           Subscriptions are one-time payments valid for 30 days. Renew manually
           before expiry to maintain access.

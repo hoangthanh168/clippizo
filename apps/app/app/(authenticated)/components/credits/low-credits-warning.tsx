@@ -32,11 +32,11 @@ export function LowCreditsWarning({
         <span>Low Credits Balance</span>
         {dismissible && (
           <Button
-            variant="ghost"
-            size="icon-sm"
+            aria-label="Dismiss"
             className="h-6 w-6 text-yellow-600 hover:bg-yellow-100 hover:text-yellow-800 dark:text-yellow-400 dark:hover:bg-yellow-900 dark:hover:text-yellow-200"
             onClick={() => setDismissed(true)}
-            aria-label="Dismiss"
+            size="icon-sm"
+            variant="ghost"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -48,7 +48,11 @@ export function LowCreditsWarning({
           credits remaining. Purchase a credit pack to continue using AI
           features without interruption.
         </p>
-        <Button variant="link" asChild className="h-auto p-0 text-yellow-800 dark:text-yellow-200">
+        <Button
+          asChild
+          className="h-auto p-0 text-yellow-800 dark:text-yellow-200"
+          variant="link"
+        >
           <Link href="/credits">Purchase Credits</Link>
         </Button>
       </AlertDescription>

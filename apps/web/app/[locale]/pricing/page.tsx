@@ -22,8 +22,7 @@ const PLANS = {
   pro: {
     id: "pro",
     name: "Pro",
-    description:
-      "Perfect for creators who need full access to AI video tools.",
+    description: "Perfect for creators who need full access to AI video tools.",
     priceUSD: 9.99,
     priceVND: 99_000,
     popular: true,
@@ -109,7 +108,9 @@ const Pricing = () => (
                   </span>
                 )}
               </div>
-              <p className="text-muted-foreground text-sm">{plan.description}</p>
+              <p className="text-muted-foreground text-sm">
+                {plan.description}
+              </p>
               <p className="mt-8 flex flex-col gap-2 text-xl lg:flex-row lg:items-center">
                 <span className="text-4xl">
                   {formatPrice(plan.priceUSD, "USD")}
