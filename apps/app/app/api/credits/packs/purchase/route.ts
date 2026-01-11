@@ -7,7 +7,11 @@ import {
 import { database } from "@repo/database";
 import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
-import { createPayPalPackOrder, createSePayPackCheckout } from "@repo/payments";
+import {
+  createPayPalPackOrder,
+  createPolarPackCheckout,
+  createSePayPackCheckout,
+} from "@repo/payments";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -134,6 +138,26 @@ export const POST = async (request: Request): Promise<Response> => {
         checkoutUrl: result.checkoutUrl,
         formFields: result.formFields,
         invoiceNumber: result.invoiceNumber,
+      });
+    }
+
+    if (provider === "polar") {
+      const result = await createPolarPackCheckout({
+        packId: pack.id,
+        profileId: profile.id,
+        successUrl: `${baseUrl}/credits/purchase/success?provider=polar`,
+      });
+
+      log.info("Polar pack checkout created", {
+        profileId: profile.id,
+        packId: pack.id,
+        checkoutId: result.checkoutId,
+      });
+
+      return NextResponse.json({
+        success: true,
+        checkoutUrl: result.checkoutUrl,
+        checkoutId: result.checkoutId,
       });
     }
 

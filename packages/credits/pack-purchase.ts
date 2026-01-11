@@ -131,7 +131,7 @@ export async function finalizeCreditPackPurchase(
   profileId: string,
   packId: string,
   paymentDetails: {
-    provider: "paypal" | "sepay";
+    provider: "paypal" | "sepay" | "polar";
     transactionId: string;
     orderId?: string;
   }

@@ -38,6 +38,28 @@ export function PaymentMethodSelector({
         >
           <Label
             className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+              value === "polar"
+                ? "border-primary bg-primary/5"
+                : "hover:bg-muted/50"
+            }`}
+            htmlFor="polar"
+          >
+            <RadioGroupItem id="polar" value="polar" />
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-base">Polar</span>
+                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary text-xs">
+                  Auto-renew
+                </span>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Pay with USD - Auto-renewing subscription
+              </p>
+            </div>
+          </Label>
+
+          <Label
+            className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
               value === "sepay"
                 ? "border-primary bg-primary/5"
                 : "hover:bg-muted/50"

@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { OrderSummary } from "./order-summary";
 import { PaymentMethodSelector } from "./payment-method-selector";
 
-export type PaymentProvider = "paypal" | "sepay";
+export type PaymentProvider = "paypal" | "sepay" | "polar";
 
 type CheckoutType = "subscription" | "pack";
 
@@ -55,47 +55,84 @@ const SUBSCRIPTION_PLANS = {
   },
 } as const;
 
+// Credit packs - synced with packages/credits/packs.ts (source of truth)
 const CREDIT_PACKS = {
-  small: {
-    id: "small",
-    name: "Small Pack",
-    credits: 200,
-    priceUSD: 4.99,
-    priceVND: 49_000,
-    validityDays: 90,
-    features: [
-      "200 credits",
-      "Valid for 90 days",
-      "Used before monthly credits",
-      "No subscription required",
-    ],
-  },
-  medium: {
-    id: "medium",
-    name: "Medium Pack",
+  starter: {
+    id: "starter",
+    name: "Starter",
     credits: 500,
     priceUSD: 9.99,
-    priceVND: 99_000,
+    priceVND: 249_000,
     validityDays: 90,
     features: [
       "500 credits",
       "Valid for 90 days",
       "Used before monthly credits",
-      "No subscription required",
+    ],
+  },
+  small: {
+    id: "small",
+    name: "Basic",
+    credits: 1200,
+    priceUSD: 19.99,
+    priceVND: 499_000,
+    validityDays: 90,
+    features: [
+      "1,200 credits",
+      "Valid for 90 days",
+      "Used before monthly credits",
+    ],
+  },
+  medium: {
+    id: "medium",
+    name: "Standard",
+    credits: 2500,
+    priceUSD: 39.99,
+    priceVND: 999_000,
+    validityDays: 90,
+    features: [
+      "2,500 credits",
+      "Valid for 90 days",
+      "Used before monthly credits",
     ],
   },
   large: {
     id: "large",
-    name: "Large Pack",
-    credits: 1200,
-    priceUSD: 19.99,
-    priceVND: 199_000,
+    name: "Pro",
+    credits: 5000,
+    priceUSD: 69.99,
+    priceVND: 1_749_000,
     validityDays: 90,
     features: [
-      "1200 credits",
+      "5,000 credits",
       "Valid for 90 days",
       "Used before monthly credits",
-      "No subscription required",
+    ],
+  },
+  xlarge: {
+    id: "xlarge",
+    name: "Business",
+    credits: 10_000,
+    priceUSD: 129.99,
+    priceVND: 3_249_000,
+    validityDays: 90,
+    features: [
+      "10,000 credits",
+      "Valid for 90 days",
+      "Used before monthly credits",
+    ],
+  },
+  enterprise: {
+    id: "enterprise",
+    name: "Enterprise",
+    credits: 25_000,
+    priceUSD: 299.99,
+    priceVND: 7_499_000,
+    validityDays: 90,
+    features: [
+      "25,000 credits",
+      "Valid for 90 days",
+      "Used before monthly credits",
     ],
   },
 } as const;
@@ -119,7 +156,7 @@ export function CheckoutContent() {
   const id = searchParams.get("id");
   const isRenewal = searchParams.get("renew") === "true";
 
-  const [provider, setProvider] = useState<PaymentProvider>("sepay");
+  const [provider, setProvider] = useState<PaymentProvider>("polar");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -182,10 +219,13 @@ export function CheckoutContent() {
       let body: Record<string, unknown>;
 
       if (type === "subscription") {
-        endpoint =
-          provider === "paypal"
-            ? "/api/checkout/paypal"
-            : "/api/checkout/sepay";
+        if (provider === "paypal") {
+          endpoint = "/api/checkout/paypal";
+        } else if (provider === "polar") {
+          endpoint = "/api/checkout/polar";
+        } else {
+          endpoint = "/api/checkout/sepay";
+        }
         body = { plan: id, isRenewal };
       } else {
         endpoint = "/api/credits/packs/purchase";
@@ -223,7 +263,7 @@ export function CheckoutContent() {
         return;
       }
 
-      // Handle PayPal - redirect to approval URL
+      // Handle PayPal/Polar - redirect to checkout URL
       const redirectUrl =
         data.approvalUrl || data.checkoutUrl || data.paymentUrl;
       if (redirectUrl) {
@@ -241,8 +281,8 @@ export function CheckoutContent() {
   };
 
   const price =
-    provider === "paypal" ? product.data.priceUSD : product.data.priceVND;
-  const currency = provider === "paypal" ? "USD" : "VND";
+    provider === "sepay" ? product.data.priceVND : product.data.priceUSD;
+  const currency = provider === "sepay" ? "VND" : "USD";
 
   const formatPrice = (amount: number, curr: string) =>
     new Intl.NumberFormat(curr === "VND" ? "vi-VN" : "en-US", {

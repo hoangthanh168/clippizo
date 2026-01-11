@@ -5,10 +5,10 @@ import { Button } from "@repo/design-system/components/ui/button";
 import { Check, Minus, Star } from "lucide-react";
 import {
   FEATURE_SECTIONS,
-  type Plan,
-  type PlanId,
   formatPrice,
   getButtonLabel,
+  type Plan,
+  type PlanId,
 } from "./pricing-data";
 
 type FeatureValueProps = {
@@ -41,7 +41,7 @@ export function PricingCardMobile({
   return (
     <div
       aria-labelledby={`plan-tab-${plan.id}`}
-      className="animate-in fade-in duration-200 rounded-xl border bg-card"
+      className="fade-in animate-in rounded-xl border bg-card duration-200"
       id={`plan-panel-${plan.id}`}
       role="tabpanel"
     >

@@ -39,7 +39,7 @@ export const CREDIT_PACKS: Record<CreditPackId, CreditPack> = {
   xlarge: {
     id: "xlarge",
     name: "Business",
-    credits: 10000,
+    credits: 10_000,
     priceUSD: 129.99,
     priceVND: 3_249_000,
     validityDays: 90,
@@ -47,7 +47,7 @@ export const CREDIT_PACKS: Record<CreditPackId, CreditPack> = {
   enterprise: {
     id: "enterprise",
     name: "Enterprise",
-    credits: 25000,
+    credits: 25_000,
     priceUSD: 299.99,
     priceVND: 7_499_000,
     validityDays: 90,

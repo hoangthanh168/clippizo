@@ -5,13 +5,14 @@ import {
   Calendar,
   CheckCircle,
   CreditCard,
+  ExternalLink,
   Loader2,
   RefreshCw,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface SubscriptionInfo {
+type SubscriptionInfo = {
   plan: string;
   status: string | null;
   expiresAt: string | null;
@@ -19,9 +20,13 @@ interface SubscriptionInfo {
   canCreate: boolean;
   features: string[];
   daysRemaining: number | null;
-}
+  provider: "paypal" | "sepay" | "polar" | null;
+};
 
-interface Payment {
+// Polar customer portal URL for managing subscriptions
+const POLAR_CUSTOMER_PORTAL_URL = "https://polar.sh/purchases/subscriptions";
+
+type Payment = {
   id: string;
   amount: number;
   currency: string;
@@ -29,7 +34,7 @@ interface Payment {
   status: string;
   plan: string;
   createdAt: string;
-}
+};
 
 export function BillingContent() {
   const router = useRouter();
@@ -99,7 +104,9 @@ export function BillingContent() {
   };
 
   const getStatusIcon = () => {
-    if (!subscription) return null;
+    if (!subscription) {
+      return null;
+    }
 
     if (subscription.isActive) {
       return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -116,7 +123,7 @@ export function BillingContent() {
           {getStatusIcon()}
         </div>
 
-        {subscription && (
+        {subscription !== null && (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <span
@@ -124,14 +131,14 @@ export function BillingContent() {
               >
                 {subscription.plan}
               </span>
-              {subscription.status && (
+              {subscription.status !== null && (
                 <span className="text-muted-foreground text-sm capitalize">
                   {subscription.status}
                 </span>
               )}
             </div>
 
-            {subscription.expiresAt && (
+            {subscription.expiresAt !== null && (
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Calendar className="h-4 w-4" />
                 <span>
@@ -165,7 +172,7 @@ export function BillingContent() {
             </div>
 
             {/* Action buttons */}
-            <div className="mt-6 flex gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               {subscription.plan === "free" ? (
                 <button
                   className="rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm"
@@ -192,6 +199,17 @@ export function BillingContent() {
                     >
                       Upgrade to Enterprise
                     </button>
+                  )}
+                  {subscription.provider === "polar" && (
+                    <a
+                      className="flex items-center gap-2 rounded-md border px-4 py-2 text-sm hover:bg-muted"
+                      href={POLAR_CUSTOMER_PORTAL_URL}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Manage Subscription
+                    </a>
                   )}
                 </>
               )}

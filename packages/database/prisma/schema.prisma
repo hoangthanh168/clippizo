@@ -38,6 +38,7 @@ enum Currency {
 enum PaymentProvider {
   sepay
   paypal
+  polar
 }
 
 enum PaymentStatus {

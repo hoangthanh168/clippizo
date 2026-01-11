@@ -3,6 +3,7 @@ import { database } from "@repo/database";
 import { isPaidPlan, PLANS, type PlanId } from "./plans";
 
 export type SubscriptionStatus = "active" | "expired" | "cancelled" | null;
+export type PaymentProvider = "paypal" | "sepay" | "polar" | null;
 
 export interface SubscriptionInfo {
   plan: PlanId;
@@ -12,6 +13,7 @@ export interface SubscriptionInfo {
   canCreate: boolean;
   features: string[];
   daysRemaining: number | null;
+  provider: PaymentProvider;
 }
 
 export async function getSubscriptionInfo(
@@ -35,6 +37,7 @@ export async function getSubscriptionInfo(
       canCreate: false,
       features: PLANS.free.features,
       daysRemaining: null,
+      provider: null,
     };
   }
 
@@ -59,6 +62,21 @@ export async function getSubscriptionInfo(
     );
   }
 
+  // Get payment provider from most recent subscription payment
+  let provider: PaymentProvider = null;
+  if (isPaidPlan(plan)) {
+    const latestPayment = await database.payment.findFirst({
+      where: {
+        profileId,
+        paymentType: "subscription",
+        status: "completed",
+      },
+      orderBy: { createdAt: "desc" },
+      select: { provider: true },
+    });
+    provider = (latestPayment?.provider as PaymentProvider) ?? null;
+  }
+
   return {
     plan,
     status: actualStatus,
@@ -67,6 +85,7 @@ export async function getSubscriptionInfo(
     canCreate,
     features: PLANS[plan]?.features ?? PLANS.free.features,
     daysRemaining,
+    provider,
   };
 }
 

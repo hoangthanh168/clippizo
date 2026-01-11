@@ -90,7 +90,7 @@ export function CreditStatus({ subscription, credits }: CreditStatusProps) {
         </Button>
       </div>
 
-      <CreditsPackDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <CreditsPackDialog onOpenChange={setDialogOpen} open={dialogOpen} />
     </div>
   );
 }

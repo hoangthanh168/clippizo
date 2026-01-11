@@ -12,9 +12,16 @@ export const creditOperationSchema = z.enum([
   "chatbot-message",
 ]);
 
-export const creditPackIdSchema = z.enum(["small", "medium", "large"]);
+export const creditPackIdSchema = z.enum([
+  "starter",
+  "small",
+  "medium",
+  "large",
+  "xlarge",
+  "enterprise",
+]);
 
-export const paymentProviderSchema = z.enum(["paypal", "sepay"]);
+export const paymentProviderSchema = z.enum(["paypal", "sepay", "polar"]);
 
 export const transactionTypeSchema = z.enum([
   "allocation",

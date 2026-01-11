@@ -63,15 +63,15 @@ describe("purchaseCreditPack", () => {
     });
 
     mockCreditSourceAggregate.mockResolvedValue({
-      _sum: { amount: 600 },
+      _sum: { amount: 2600 },
     });
 
     mockCreditSourceCreate.mockResolvedValue({
       id: "source-pack",
       profileId,
       type: "pack",
-      amount: 500,
-      initialAmount: 500,
+      amount: 2500,
+      initialAmount: 2500,
       packId: "medium",
       expiresAt: expect.any(Date),
     });
@@ -80,14 +80,14 @@ describe("purchaseCreditPack", () => {
       id: "txn-pack",
       profileId,
       type: "pack_purchase",
-      amount: 500,
-      balanceAfter: 600,
+      amount: 2500,
+      balanceAfter: 2600,
     });
 
     const result = await purchaseCreditPack(profileId, packId);
 
-    expect(result.creditsAdded).toBe(500);
-    expect(result.totalBalance).toBe(600);
+    expect(result.creditsAdded).toBe(2500);
+    expect(result.totalBalance).toBe(2600);
     expect(mockCreditSourceCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({

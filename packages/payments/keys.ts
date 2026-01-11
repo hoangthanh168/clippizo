@@ -15,6 +15,22 @@ export const keys = () =>
       SEPAY_SECRET_KEY: z.string().optional(), // API secret for checkout signature
       SEPAY_IPN_SECRET: z.string().optional(), // IPN secret for webhook verification
       SEPAY_MODE: z.enum(["sandbox", "production"]).default("sandbox"),
+
+      // Polar (optional for initial deployment)
+      POLAR_ACCESS_TOKEN: z.string().optional(),
+      POLAR_WEBHOOK_SECRET: z.string().optional(),
+      POLAR_MODE: z.enum(["sandbox", "production"]).default("sandbox"),
+      // Polar product IDs (from Polar dashboard)
+      // Subscriptions
+      POLAR_PRODUCT_PRO: z.string().optional(),
+      POLAR_PRODUCT_ENTERPRISE: z.string().optional(),
+      // Credit packs
+      POLAR_PRODUCT_PACK_STARTER: z.string().optional(),
+      POLAR_PRODUCT_PACK_SMALL: z.string().optional(),
+      POLAR_PRODUCT_PACK_MEDIUM: z.string().optional(),
+      POLAR_PRODUCT_PACK_LARGE: z.string().optional(),
+      POLAR_PRODUCT_PACK_XLARGE: z.string().optional(),
+      POLAR_PRODUCT_PACK_ENTERPRISE: z.string().optional(),
     },
     runtimeEnv: {
       // PayPal
@@ -28,5 +44,18 @@ export const keys = () =>
       SEPAY_SECRET_KEY: process.env.SEPAY_SECRET_KEY,
       SEPAY_IPN_SECRET: process.env.SEPAY_IPN_SECRET,
       SEPAY_MODE: process.env.SEPAY_MODE,
+
+      // Polar
+      POLAR_ACCESS_TOKEN: process.env.POLAR_ACCESS_TOKEN,
+      POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET,
+      POLAR_MODE: process.env.POLAR_MODE,
+      POLAR_PRODUCT_PRO: process.env.POLAR_PRODUCT_PRO,
+      POLAR_PRODUCT_ENTERPRISE: process.env.POLAR_PRODUCT_ENTERPRISE,
+      POLAR_PRODUCT_PACK_STARTER: process.env.POLAR_PRODUCT_PACK_STARTER,
+      POLAR_PRODUCT_PACK_SMALL: process.env.POLAR_PRODUCT_PACK_SMALL,
+      POLAR_PRODUCT_PACK_MEDIUM: process.env.POLAR_PRODUCT_PACK_MEDIUM,
+      POLAR_PRODUCT_PACK_LARGE: process.env.POLAR_PRODUCT_PACK_LARGE,
+      POLAR_PRODUCT_PACK_XLARGE: process.env.POLAR_PRODUCT_PACK_XLARGE,
+      POLAR_PRODUCT_PACK_ENTERPRISE: process.env.POLAR_PRODUCT_PACK_ENTERPRISE,
     },
   });

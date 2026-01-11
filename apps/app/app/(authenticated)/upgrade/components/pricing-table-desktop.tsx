@@ -1,17 +1,17 @@
 "use client";
 
-import { Fragment } from "react";
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
 import { Check, Minus, Star } from "lucide-react";
+import { Fragment } from "react";
 import {
   FEATURE_SECTIONS,
+  formatPrice,
+  getButtonLabel,
   PLAN_ORDER,
   PLANS,
   type Plan,
   type PlanId,
-  formatPrice,
-  getButtonLabel,
 } from "./pricing-data";
 
 type FeatureValueProps = {
@@ -120,7 +120,7 @@ export function PricingTableDesktop({
               <th className="sticky left-0 z-20 bg-card" />
               {plans.map((plan) => (
                 <th
-                  className="border-l px-4 pb-4 pt-2 text-center font-normal"
+                  className="border-l px-4 pt-2 pb-4 text-center font-normal"
                   key={`btn-${plan.id}`}
                 >
                   <Button
@@ -143,7 +143,10 @@ export function PricingTableDesktop({
                     {section.title}
                   </td>
                   {plans.map((plan) => (
-                    <td className="border-l" key={`section-${section.title}-${plan.id}`} />
+                    <td
+                      className="border-l"
+                      key={`section-${section.title}-${plan.id}`}
+                    />
                   ))}
                 </tr>
                 {section.features.map((feature) => (

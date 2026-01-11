@@ -59,7 +59,7 @@ export function PlanTabsMobile({
             aria-controls={`plan-panel-${planId}`}
             aria-selected={isSelected}
             className={cn(
-              "relative flex flex-1 flex-col items-center justify-center gap-0.5 px-2 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              "relative flex flex-1 flex-col items-center justify-center gap-0.5 px-2 py-2 font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               isSelected
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
@@ -78,7 +78,7 @@ export function PlanTabsMobile({
             )}
             {/* Active indicator line */}
             {isSelected && (
-              <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-primary" />
+              <span className="absolute right-3 bottom-0 left-3 h-0.5 rounded-full bg-primary" />
             )}
           </button>
         );

@@ -71,7 +71,7 @@ export function CreditsPackDialog({
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className="max-h-[90vh] w-[95vw] overflow-y-auto p-4 sm:w-auto sm:max-w-4xl sm:p-6 lg:max-w-6xl">
         <DialogHeader>
           <DialogTitle>Purchase Credit Packs</DialogTitle>
