@@ -23,9 +23,9 @@ function FeatureValue({ value }: FeatureValueProps) {
     return <span className="text-sm">{value}</span>;
   }
   if (value === true) {
-    return <Check className="mx-auto h-5 w-5 text-green-500" />;
+    return <Check className="h-5 w-5 text-green-500" />;
   }
-  return <Minus className="mx-auto h-5 w-5 text-muted-foreground" />;
+  return <Minus className="h-5 w-5 text-muted-foreground" />;
 }
 
 type PricingTableDesktopProps = {

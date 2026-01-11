@@ -66,7 +66,13 @@ export type CreditCostConfig = {
 // Credit Pack Types
 // ===========================================
 
-export type CreditPackId = "small" | "medium" | "large";
+export type CreditPackId =
+  | "starter"
+  | "small"
+  | "medium"
+  | "large"
+  | "xlarge"
+  | "enterprise";
 
 export type CreditPack = {
   id: CreditPackId;

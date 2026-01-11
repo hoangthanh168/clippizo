@@ -53,7 +53,7 @@ export function LowCreditsWarning({
           className="h-auto p-0 text-yellow-800 dark:text-yellow-200"
           variant="link"
         >
-          <Link href="/credits">Purchase Credits</Link>
+          <Link href="/upgrade">Purchase Credits</Link>
         </Button>
       </AlertDescription>
     </Alert>

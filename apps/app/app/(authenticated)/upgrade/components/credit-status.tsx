@@ -3,8 +3,10 @@
 import type { CreditBalance } from "@repo/credits";
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
-import { Calendar, Settings } from "lucide-react";
+import { Calendar, Package, Settings } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { CreditsPackDialog } from "./credits-pack-dialog";
 
 type SubscriptionInfo = {
   plan: string;
@@ -37,6 +39,7 @@ const formatDate = (dateString: string) =>
   });
 
 export function CreditStatus({ subscription, credits }: CreditStatusProps) {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const plan = subscription?.plan ?? "free";
   const creditsTotal = credits?.total ?? 0;
 
@@ -74,12 +77,20 @@ export function CreditStatus({ subscription, credits }: CreditStatusProps) {
         Subscribe for more credits and full access to all features
       </p>
 
-      <Button asChild className="mt-2 w-fit" size="sm" variant="outline">
-        <Link href="/billing">
-          <Settings className="mr-2 h-3 w-3" />
-          Manage subscription
-        </Link>
-      </Button>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <Button asChild size="sm" variant="outline">
+          <Link href="/billing">
+            <Settings className="mr-2 h-3 w-3" />
+            Manage subscription
+          </Link>
+        </Button>
+        <Button onClick={() => setDialogOpen(true)} size="sm" variant="outline">
+          <Package className="mr-2 h-3 w-3" />
+          Buy Credits
+        </Button>
+      </div>
+
+      <CreditsPackDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </div>
   );
 }

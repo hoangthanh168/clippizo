@@ -34,7 +34,6 @@ import {
   BookOpenIcon,
   BotIcon,
   ChevronRightIcon,
-  CoinsIcon,
   CreditCardIcon,
   LifeBuoyIcon,
   SendIcon,
@@ -143,11 +142,6 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Credits",
-      url: "/credits",
-      icon: CoinsIcon,
-    },
     {
       title: "Upgrade",
       url: "/upgrade",

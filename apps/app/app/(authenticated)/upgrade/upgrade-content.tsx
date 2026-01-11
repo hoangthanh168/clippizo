@@ -83,7 +83,7 @@ export function UpgradeContent() {
 
   return (
     <div className="w-full space-y-8 pb-20 md:pb-0">
-      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <CreditStatus credits={credits} subscription={subscription} />
         <BillingToggle />
       </div>

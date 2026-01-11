@@ -39,7 +39,7 @@ export function BillingToggle({
             { key: "right", icon: ChevronRight, onClick: onScrollRight },
           ].map(({ key, icon: Icon, onClick }) => (
             <button
-              className="flex h-7 w-7 items-center justify-center rounded border hover:bg-muted"
+              className="flex h-7 w-7 items-center justify-center rounded border transition-colors hover:bg-muted"
               key={key}
               onClick={onClick}
               type="button"

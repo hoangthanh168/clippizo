@@ -4,7 +4,18 @@ import { withLogging, withSentry } from "@repo/observability/next-config";
 import type { NextConfig } from "next";
 import { env } from "@/env";
 
-let nextConfig: NextConfig = withToolbar(withLogging(config));
+let nextConfig: NextConfig = {
+  ...withToolbar(withLogging(config)),
+  async redirects() {
+    return [
+      {
+        source: "/credits",
+        destination: "/upgrade",
+        permanent: true,
+      },
+    ];
+  },
+};
 
 if (env.VERCEL) {
   nextConfig = withSentry(nextConfig);
