@@ -60,7 +60,7 @@ const BlogIndex = async ({ params }: BlogProps) => {
                     src={post.image.url}
                     width={post.image.width}
                   />
-                  <div className="flex flex-row items-center gap-4">
+                  <div className="flex items-center gap-4">
                     <p className="text-muted-foreground text-sm">
                       {new Date(post.date).toLocaleDateString("en-US", {
                         month: "long",

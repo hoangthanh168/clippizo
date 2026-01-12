@@ -44,7 +44,7 @@ export const Hero = async ({ dictionary }: HeroProps) => {
               {dictionary.web.home.meta.description}
             </p>
           </div>
-          <div className="flex flex-row gap-3">
+          <div className="flex gap-3">
             <Button asChild className="gap-4" size="lg" variant="outline">
               <Link href="/contact">
                 Get in touch <PhoneCall className="h-4 w-4" />

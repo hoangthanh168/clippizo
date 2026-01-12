@@ -58,11 +58,11 @@ export const Header = ({ dictionary }: HeaderProps) => {
   const [isOpen, setOpen] = useState(false);
   return (
     <header className="sticky top-0 left-0 z-40 w-full border-b bg-background">
-      <div className="container relative mx-auto flex min-h-20 flex-row items-center gap-4 lg:grid lg:grid-cols-3">
+      <div className="container relative mx-auto flex min-h-20 items-center gap-4 lg:grid lg:grid-cols-3">
         <div className="hidden flex-row items-center justify-start gap-4 lg:flex">
           {mounted ? (
             <NavigationMenu className="flex items-start justify-start">
-              <NavigationMenuList className="flex flex-row justify-start gap-4">
+              <NavigationMenuList className="flex justify-start gap-4">
                 {navigationItems.map((item) => (
                   <NavigationMenuItem key={item.title}>
                     {item.href ? (
@@ -94,7 +94,7 @@ export const Header = ({ dictionary }: HeaderProps) => {
                             <div className="flex h-full flex-col justify-end text-sm">
                               {item.items?.map((subItem, idx) => (
                                 <NavigationMenuLink
-                                  className="flex flex-row items-center justify-between rounded px-4 py-2 hover:bg-muted"
+                                  className="flex items-center justify-between rounded px-4 py-2 hover:bg-muted"
                                   href={subItem.href}
                                   key={idx}
                                 >
@@ -112,7 +112,7 @@ export const Header = ({ dictionary }: HeaderProps) => {
               </NavigationMenuList>
             </NavigationMenu>
           ) : (
-            <nav className="flex flex-row gap-4">
+            <nav className="flex gap-4">
               {navigationItems.map((item) => (
                 <Button asChild key={item.title} variant="ghost">
                   <Link href={item.href || "#"}>{item.title}</Link>
