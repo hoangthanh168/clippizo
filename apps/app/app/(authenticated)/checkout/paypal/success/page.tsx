@@ -14,7 +14,7 @@ export default function PayPalSuccessPage() {
     <>
       <Header page="Payment Success" />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="flex min-h-[100vh] flex-1 items-center justify-center rounded-xl bg-muted/50 p-6 md:min-h-min">
+        <div className="flex min-h-screen flex-1 items-center justify-center rounded-xl bg-muted/50 p-6 md:min-h-min">
           <Suspense fallback={<Spinner />}>
             <PayPalSuccessContent />
           </Suspense>
