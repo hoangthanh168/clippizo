@@ -25,18 +25,18 @@ type CreditsPackDialogProps = {
 function CreditsPackSkeleton() {
   return (
     <Card className="flex flex-col">
-      <CardHeader>
+      <CardHeader className="p-3 sm:p-4 md:p-6">
         <Skeleton className="h-5 w-24" />
-        <Skeleton className="h-8 w-20" />
+        <Skeleton className="h-7 w-20" />
       </CardHeader>
-      <CardContent className="flex-1 space-y-2">
+      <CardContent className="flex-1 space-y-1.5 p-3 pt-0 sm:space-y-2 sm:p-4 sm:pt-0 md:p-6 md:pt-0">
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-full" />
       </CardContent>
-      <div className="space-y-3 p-6 pt-0">
-        <Skeleton className="mx-auto h-6 w-24" />
-        <Skeleton className="h-10 w-full" />
+      <div className="space-y-2 p-3 pt-0 sm:space-y-3 sm:p-4 sm:pt-0 md:p-6 md:pt-0">
+        <Skeleton className="mx-auto h-5 w-20 sm:h-6 sm:w-24" />
+        <Skeleton className="h-9 w-full sm:h-10" />
       </div>
     </Card>
   );
@@ -72,7 +72,7 @@ export function CreditsPackDialog({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-h-[90vh] w-[95vw] overflow-y-auto p-4 sm:w-auto sm:max-w-4xl sm:p-6 lg:max-w-6xl">
+      <DialogContent className="max-h-[90vh] w-full max-w-[calc(100vw-2rem)] overflow-y-auto p-3 sm:max-w-2xl sm:p-4 md:max-w-4xl md:p-6 lg:max-w-5xl">
         <DialogHeader>
           <DialogTitle>Purchase Credit Packs</DialogTitle>
           <DialogDescription>
